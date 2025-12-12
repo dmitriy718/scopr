@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Endpoint Discovery Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+        }
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        .card-header {
+            background: rgba(51, 65, 85, 0.5);
+            border-bottom: 1px solid rgba(100, 116, 139, 0.3);
+        }
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: #e2e8f0;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--primary-color);
+            color: #e2e8f0;
+            box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+        .progress {
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        }
+        .status-success { color: var(--success-color); }
+        .status-redirect { color: var(--warning-color); }
+        .status-forbidden { color: #a855f7; }
+        .status-notfound { color: #6b7280; }
+        .status-error { color: var(--danger-color); }
+        .result-item {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+        }
+        .result-item:hover {
+            background: rgba(51, 65, 85, 0.3);
+        }
+        .status-badge {
+            display: inline-block;
+            min-width: 45px;
+            text-align: center;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-200 { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge-301, .badge-302 { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+        .badge-403 { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .badge-404 { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+        .badge-500 { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .tech-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            margin: 0.125rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--info-color);
+        }
+        .stats-card {
+            text-align: center;
+            padding: 1rem;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .stats-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        #results-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .scanning-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .nav-tabs .nav-link {
+            color: #94a3b8;
+            border: none;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: transparent;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .export-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="bi bi-search me-2"></i>Web Endpoint Discovery
+                </h1>
+                <p class="text-secondary">Discover folders, endpoints, and technologies on any web server</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Scan Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="scan-form">
+                            <div class="mb-3">
+                                <label class="form-label">Target Domain</label>
+                                <input type="text" class="form-control" id="domain" 
+                                       placeholder="example.com" required>
+                                <small class="text-secondary">Enter domain without http/https</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Wordlist</label>
+                                <select class="form-select" id="wordlist">
+                                    <option value="all">All Paths (Comprehensive)</option>
+                                    <option value="directories">Directories Only</option>
+                                    <option value="api">API Endpoints</option>
+                                    <option value="hidden">Hidden/Sensitive Files</option>
+                                    <option value="files">Common Files</option>
+                                    <option value="backup">Backup Files</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Discovery Options</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="parse-robots" checked>
+                                    <label class="form-check-label" for="parse-robots">
+                                        Parse robots.txt
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="parse-sitemap" checked>
+                                    <label class="form-check-label" for="parse-sitemap">
+                                        Parse sitemap.xml
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="recursive">
+                                    <label class="form-check-label" for="recursive">
+                                        Recursive Discovery
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="scan-subdomains">
+                                    <label class="form-check-label" for="scan-subdomains">
+                                        Enumerate Subdomains
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="recursive-depth-container" style="display: none;">
+                                <label class="form-label">Recursive Depth</label>
+                                <select class="form-select" id="recursive-depth">
+                                    <option value="1">1 Level</option>
+                                    <option value="2" selected>2 Levels</option>
+                                    <option value="3">3 Levels</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <a class="text-decoration-none" data-bs-toggle="collapse" href="#auth-section">
+                                    <i class="bi bi-lock me-1"></i>Authentication (Optional)
+                                </a>
+                                <div class="collapse mt-2" id="auth-section">
+                                    <select class="form-select mb-2" id="auth-type">
+                                        <option value="">No Authentication</option>
+                                        <option value="basic">Basic Auth (user:pass)</option>
+                                        <option value="bearer">Bearer Token</option>
+                                    </select>
+                                    <input type="text" class="form-control" id="auth-value" 
+                                           placeholder="user:password or token">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <a class="text-decoration-none" data-bs-toggle="collapse" href="#custom-wordlist-section">
+                                    <i class="bi bi-list-ul me-1"></i>Custom Paths (Optional)
+                                </a>
+                                <div class="collapse mt-2" id="custom-wordlist-section">
+                                    <textarea class="form-control" id="custom-wordlist" rows="4"
+                                              placeholder="Enter custom paths, one per line&#10;admin&#10;api/v2&#10;secret"></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100" id="scan-btn">
+                                <i class="bi bi-play-fill me-1"></i>Start Scan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card mb-4" id="progress-card" style="display: none;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span id="scan-status" class="scanning-animation">
+                                <i class="bi bi-arrow-repeat me-1"></i>Scanning...
+                            </span>
+                            <span id="scan-progress-text">0 / 0</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4" id="stats-row" style="display: none;">
+                    <div class="col-3">
+                        <div class="card stats-card">
+                            <div class="stats-number status-success" id="stat-success">0</div>
+                            <div class="stats-label">Found</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card stats-card">
+                            <div class="stats-number status-redirect" id="stat-redirect">0</div>
+                            <div class="stats-label">Redirects</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card stats-card">
+                            <div class="stats-number status-forbidden" id="stat-forbidden">0</div>
+                            <div class="stats-label">Forbidden</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card stats-card">
+                            <div class="stats-number status-error" id="stat-error">0</div>
+                            <div class="stats-label">Errors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="results-card" style="display: none;">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <ul class="nav nav-tabs card-header-tabs" id="results-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#" data-filter="all">All</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-filter="success">Found</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-filter="redirect">Redirects</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-filter="forbidden">Forbidden</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" data-filter="tech">Technologies</a>
+                                </li>
+                            </ul>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-light export-btn" id="export-json">
+                                    <i class="bi bi-filetype-json"></i> JSON
+                                </button>
+                                <button class="btn btn-outline-light export-btn" id="export-csv">
+                                    <i class="bi bi-filetype-csv"></i> CSV
+                                </button>
+                                <button class="btn btn-outline-light export-btn" id="export-txt">
+                                    <i class="bi bi-filetype-txt"></i> TXT
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="results-container"></div>
+                        <div id="tech-container" style="display: none;" class="p-3"></div>
+                    </div>
+                </div>
+
+                <div class="card mt-4" id="subdomains-card" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Discovered Subdomains</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="subdomains-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentScanId = null;
+        let allResults = [];
+        let technologies = [];
+
+        document.getElementById('recursive').addEventListener('change', function() {
+            document.getElementById('recursive-depth-container').style.display = 
+                this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('scan-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const domain = document.getElementById('domain').value.trim();
+            if (!domain) return;
+
+            const customWords = document.getElementById('custom-wordlist').value
+                .split('\n')
+                .map(s => s.trim())
+                .filter(s => s);
+
+            const options = {
+                wordlist: document.getElementById('wordlist').value,
+                parse_robots: document.getElementById('parse-robots').checked,
+                parse_sitemap: document.getElementById('parse-sitemap').checked,
+                recursive: document.getElementById('recursive').checked,
+                recursive_depth: parseInt(document.getElementById('recursive-depth').value),
+                scan_subdomains: document.getElementById('scan-subdomains').checked,
+                auth_type: document.getElementById('auth-type').value || null,
+                auth_value: document.getElementById('auth-value').value || null,
+                custom_wordlist: customWords
+            };
+
+            document.getElementById('scan-btn').disabled = true;
+            document.getElementById('scan-btn').innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Scanning...';
+            document.getElementById('progress-card').style.display = 'block';
+            document.getElementById('stats-row').style.display = 'none';
+            document.getElementById('results-card').style.display = 'none';
+            document.getElementById('subdomains-card').style.display = 'none';
+
+            try {
+                const startRes = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domain, options })
+                });
+                const startData = await startRes.json();
+                
+                if (startData.error) {
+                    throw new Error(startData.error);
+                }
+
+                currentScanId = startData.scan_id;
+
+                const execRes = await fetch(`/api/scan/${currentScanId}/execute`, {
+                    method: 'POST'
+                });
+                const execData = await execRes.json();
+
+                if (execData.error) {
+                    throw new Error(execData.error);
+                }
+
+                const resultsRes = await fetch(`/api/scan/${currentScanId}/results`);
+                const resultsData = await resultsRes.json();
+
+                allResults = resultsData.results || [];
+                technologies = resultsData.technologies || [];
+
+                displayResults(allResults);
+                displayTechnologies(technologies);
+                
+                if (resultsData.subdomains && resultsData.subdomains.length > 0) {
+                    displaySubdomains(resultsData.subdomains);
+                }
+
+                document.getElementById('scan-status').innerHTML = 
+                    '<i class="bi bi-check-circle me-1"></i>Scan Complete';
+                document.getElementById('scan-status').classList.remove('scanning-animation');
+
+            } catch (error) {
+                alert('Scan error: ' + error.message);
+                document.getElementById('scan-status').innerHTML = 
+                    '<i class="bi bi-x-circle me-1"></i>Scan Failed';
+            } finally {
+                document.getElementById('scan-btn').disabled = false;
+                document.getElementById('scan-btn').innerHTML = 
+                    '<i class="bi bi-play-fill me-1"></i>Start Scan';
+            }
+        });
+
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            let successCount = 0, redirectCount = 0, forbiddenCount = 0, errorCount = 0;
+
+            results.forEach(r => {
+                const status = r.status_code;
+                let badgeClass = 'badge-404';
+                let statusClass = 'status-notfound';
+
+                if (status >= 200 && status < 300 && !r.is_soft_404) {
+                    badgeClass = 'badge-200';
+                    statusClass = 'status-success';
+                    successCount++;
+                } else if (status >= 300 && status < 400) {
+                    badgeClass = 'badge-301';
+                    statusClass = 'status-redirect';
+                    redirectCount++;
+                } else if (status === 403) {
+                    badgeClass = 'badge-403';
+                    statusClass = 'status-forbidden';
+                    forbiddenCount++;
+                } else if (status >= 500 || r.error) {
+                    badgeClass = 'badge-500';
+                    statusClass = 'status-error';
+                    errorCount++;
+                }
+
+                const item = document.createElement('div');
+                item.className = `result-item ${statusClass}`;
+                item.dataset.status = status;
+                item.dataset.type = getStatusType(status, r.is_soft_404, r.error);
+                
+                let html = `<span class="status-badge ${badgeClass}">${status || 'ERR'}</span> `;
+                html += `<a href="${r.url}" target="_blank" class="text-decoration-none ${statusClass}">${r.url}</a>`;
+                
+                if (r.redirect_url) {
+                    html += ` <i class="bi bi-arrow-right text-secondary"></i> <small class="text-secondary">${r.redirect_url}</small>`;
+                }
+                if (r.is_soft_404) {
+                    html += ` <span class="badge bg-warning text-dark">Soft 404</span>`;
+                }
+                
+                item.innerHTML = html;
+                container.appendChild(item);
+            });
+
+            document.getElementById('stat-success').textContent = successCount;
+            document.getElementById('stat-redirect').textContent = redirectCount;
+            document.getElementById('stat-forbidden').textContent = forbiddenCount;
+            document.getElementById('stat-error').textContent = errorCount;
+
+            document.getElementById('stats-row').style.display = 'flex';
+            document.getElementById('results-card').style.display = 'block';
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('scan-progress-text').textContent = 
+                `${results.length} / ${results.length}`;
+        }
+
+        function getStatusType(status, isSoft404, error) {
+            if (error) return 'error';
+            if (isSoft404) return 'notfound';
+            if (status >= 200 && status < 300) return 'success';
+            if (status >= 300 && status < 400) return 'redirect';
+            if (status === 403) return 'forbidden';
+            return 'other';
+        }
+
+        function displayTechnologies(techs) {
+            const container = document.getElementById('tech-container');
+            if (!techs || techs.length === 0) {
+                container.innerHTML = '<p class="text-secondary">No technologies detected</p>';
+                return;
+            }
+
+            let html = '<div class="row">';
+            
+            const grouped = {};
+            techs.forEach(t => {
+                if (!grouped[t.category]) grouped[t.category] = [];
+                grouped[t.category].push(t);
+            });
+
+            for (const [category, items] of Object.entries(grouped)) {
+                html += `<div class="col-md-6 mb-3">`;
+                html += `<h6 class="text-uppercase text-secondary mb-2">${category}</h6>`;
+                items.forEach(t => {
+                    html += `<span class="tech-badge">${t.name}`;
+                    if (t.version) html += ` v${t.version}`;
+                    html += `</span>`;
+                });
+                html += `</div>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displaySubdomains(subdomains) {
+            const container = document.getElementById('subdomains-container');
+            container.innerHTML = '';
+
+            subdomains.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.innerHTML = `
+                    <strong class="status-success">${s.full_domain}</strong>
+                    ${s.ip_addresses.length ? `<span class="text-secondary ms-2">${s.ip_addresses.join(', ')}</span>` : ''}
+                    ${s.cname ? `<span class="text-secondary ms-2">CNAME: ${s.cname}</span>` : ''}
+                `;
+                container.appendChild(item);
+            });
+
+            if (subdomains.length > 0) {
+                document.getElementById('subdomains-card').style.display = 'block';
+            }
+        }
+
+        document.querySelectorAll('#results-tabs .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('#results-tabs .nav-link').forEach(l => 
+                    l.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.dataset.filter;
+                
+                if (filter === 'tech') {
+                    document.getElementById('results-container').style.display = 'none';
+                    document.getElementById('tech-container').style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('results-container').style.display = 'block';
+                document.getElementById('tech-container').style.display = 'none';
+
+                const items = document.querySelectorAll('.result-item');
+                items.forEach(item => {
+                    if (filter === 'all') {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = item.dataset.type === filter ? 'block' : 'none';
+                    }
+                });
+            });
+        });
+
+        document.getElementById('export-json').addEventListener('click', () => exportResults('json'));
+        document.getElementById('export-csv').addEventListener('click', () => exportResults('csv'));
+        document.getElementById('export-txt').addEventListener('click', () => exportResults('txt'));
+
+        function exportResults(format) {
+            if (!currentScanId) return;
+            window.location.href = `/api/scan/${currentScanId}/export/${format}`;
+        }
+    </script>
+</body>
+</html>
