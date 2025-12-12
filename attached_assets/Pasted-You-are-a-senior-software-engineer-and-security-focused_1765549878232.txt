@@ -1,0 +1,79 @@
+You are a senior software engineer and security-focused full-stack developer. Your task is to design and develop a production-ready, fully documented web folder and endpoint discovery tool, made to run seamlessly on Replit.
+
+The tool must accept a domain input (e.g., abc.com) and scan the domain for all accessible folders and endpoints. The output should be a comprehensive list of working URLs, like:
+
+https://abc.com/
+https://abc.com/api/
+https://abc.com/admin/
+https://abc.com/assets/images/
+https://abc.com/this/folder/hidden/
+
+🔧 CORE FUNCTIONALITY:
+	1.	Accept a domain input via a simple command-line interface or Replit web UI.
+	2.	Discover and list accessible endpoints and folders based on HTTP response codes.
+	3.	Support discovery of hidden or obscure folders.
+	4.	Handle redirects, protected resources, and soft 404s.
+	5.	Display real-time progress and status (via rich, tqdm, or similar).
+	6.	Perform safely within Replit’s limitations (resource caps, networking).
+
+⸻
+
+🧠 ADVANCED FEATURES (Minimum 10 – Must Be Real and Implemented):
+	1.	Multithreaded or Asynchronous Scanning – using asyncio + aiohttp or similar.
+	2.	Custom Wordlist Support – allow uploading or selecting built-in lists.
+	3.	Recursive Discovery – detect subfolders automatically.
+	4.	Subdomain Enumeration – optionally detect subdomains like admin.abc.com.
+	5.	Technology Fingerprinting – identify frameworks, CMS, JS libraries, etc.
+	6.	Status Code Categorization – with color-coded output.
+	7.	Exporting Results – allow downloads as .txt, .json, .csv.
+	8.	robots.txt and sitemap.xml Analysis – auto-parse for additional paths.
+	9.	Parameter Discovery – check for URL parameters like ?id=, ?q=.
+	10.	Authentication Support – include optional Basic Auth, Bearer Token input.
+
+✅ Bonus features encouraged (if feasible on Replit):
+	•	JS-based crawler for dynamic routes (using Pyppeteer or Playwright)
+	•	TLS/SSL certificate parsing
+	•	CDN detection
+
+⸻
+
+🛑 MANDATORY REALISM RULE:
+	•	All code must be real, executable, and runnable on Replit.
+	•	No made-up or fictional code. No placeholders, mock modules, or pseudo-code.
+	•	If any feature requires external access or an API key, clearly indicate what is needed — I will provide it later for plug-and-play.
+	•	Account for Replit’s restrictions (e.g. limited persistent file system, RAM, outbound rate limits).
+
+⸻
+
+🖥️ REPLIT-SPECIFIC REQUIREMENTS:
+	•	Must be deployable in Replit with no local installation.
+	•	Provide a .replit file and replit.nix (if needed).
+	•	Use a main.py or index.py entry point.
+	•	Include a working UI via Flask or replit.web, or a CLI interface.
+	•	All file paths, imports, and runtime logic must respect Replit’s sandbox environment.
+
+⸻
+
+📄 DELIVERABLES:
+	1.	Complete Codebase – with all logic working on Replit (no external dev environment needed).
+	2.	README.md – including:
+	•	What this tool does
+	•	How to run it in Replit
+	•	Required Replit settings (e.g., secrets, packages)
+	•	Usage Examples and Output Formats
+	3.	“How to Use” Guide – standalone, with screenshots or output examples:
+	•	Setup and first run
+	•	Using core + advanced features
+	•	Exporting and interpreting results
+	4.	Code Comments – all classes/functions must have docstrings and inline comments.
+	5.	Testing (optional but preferred) – include sample test cases if possible.
+	6.	Configuration file – allow .env or JSON config file for settings (auth, timeout, etc.)
+
+⸻
+
+💬 FINAL INSTRUCTIONS:
+	•	Start by outlining architecture and dependency requirements (including all replit.nix or poetry if used).
+	•	Build the tool module-by-module.
+	•	Make sure all code is real, minimal use of abstractions, no “imagine” or “assume” language.
+	•	Separate explanations and code blocks cleanly, using Replit-friendly formatting.
+	•	Treat this as if you’re shipping it to a production team for security audit and deployment.
