@@ -20,6 +20,7 @@ from src.parsers import parse_all_sources, HTMLLinkParser
 from src.fingerprint import TechnologyFingerprinter
 from src.subdomain import SubdomainEnumerator
 from src.exporter import ResultExporter, export_results
+from src.parameters import ParameterScanner, discover_parameters
 
 load_dotenv()
 
@@ -94,6 +95,7 @@ def start_scan():
             "results": [],
             "technologies": [],
             "subdomains": [],
+            "parameters": [],
             "started_at": datetime.now().isoformat(),
             "completed_at": None,
             "error": None,
@@ -241,6 +243,17 @@ async def run_scan(scan_data: dict) -> List[dict]:
         except Exception as e:
             logger.warning(f"Subdomain enumeration error: {e}")
 
+    if options.get("scan_parameters", False):
+        try:
+            import aiohttp
+            successful_urls = [r.url for r in results if r.status_code == 200 and not r.is_soft_404]
+            if successful_urls:
+                async with aiohttp.ClientSession() as session:
+                    param_results = await discover_parameters(session, successful_urls, max_urls=10)
+                    scan_data["parameters"] = param_results
+        except Exception as e:
+            logger.warning(f"Parameter discovery error: {e}")
+
     return [r.to_dict() for r in results]
 
 
@@ -292,6 +305,7 @@ def get_scan_results(scan_id: str):
         "results": results,
         "technologies": scan_data.get("technologies", []),
         "subdomains": scan_data.get("subdomains", []),
+        "parameters": scan_data.get("parameters", []),
         "total": len(results)
     })
 

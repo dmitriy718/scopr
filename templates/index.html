@@ -198,6 +198,12 @@
                                         Enumerate Subdomains
                                     </label>
                                 </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="scan-parameters">
+                                    <label class="form-check-label" for="scan-parameters">
+                                        Parameter Discovery
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="mb-3" id="recursive-depth-container" style="display: none;">
@@ -331,6 +337,15 @@
                         <div id="subdomains-container"></div>
                     </div>
                 </div>
+
+                <div class="card mt-4" id="parameters-card" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-braces me-2"></i>Discovered Parameters</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="parameters-container"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -364,6 +379,7 @@
                 recursive: document.getElementById('recursive').checked,
                 recursive_depth: parseInt(document.getElementById('recursive-depth').value),
                 scan_subdomains: document.getElementById('scan-subdomains').checked,
+                scan_parameters: document.getElementById('scan-parameters').checked,
                 auth_type: document.getElementById('auth-type').value || null,
                 auth_value: document.getElementById('auth-value').value || null,
                 custom_wordlist: customWords
@@ -375,6 +391,7 @@
             document.getElementById('stats-row').style.display = 'none';
             document.getElementById('results-card').style.display = 'none';
             document.getElementById('subdomains-card').style.display = 'none';
+            document.getElementById('parameters-card').style.display = 'none';
 
             try {
                 const startRes = await fetch('/api/scan', {
@@ -410,6 +427,10 @@
                 
                 if (resultsData.subdomains && resultsData.subdomains.length > 0) {
                     displaySubdomains(resultsData.subdomains);
+                }
+
+                if (resultsData.parameters && resultsData.parameters.length > 0) {
+                    displayParameters(resultsData.parameters);
                 }
 
                 document.getElementById('scan-status').innerHTML = 
@@ -543,6 +564,29 @@
 
             if (subdomains.length > 0) {
                 document.getElementById('subdomains-card').style.display = 'block';
+            }
+        }
+
+        function displayParameters(params) {
+            const container = document.getElementById('parameters-container');
+            container.innerHTML = '';
+
+            params.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                const diffBadge = p.is_different ? '<span class="badge bg-warning text-dark ms-2">Response Changed</span>' : '';
+                item.innerHTML = `
+                    <span class="status-badge badge-200">${p.status_code}</span>
+                    <code class="text-info ms-2">?${p.parameter}=${p.value}</code>
+                    <a href="${p.url}" target="_blank" class="text-decoration-none status-success ms-2">${p.base_url}</a>
+                    ${diffBadge}
+                    <small class="text-secondary ms-2">(${p.content_length} bytes)</small>
+                `;
+                container.appendChild(item);
+            });
+
+            if (params.length > 0) {
+                document.getElementById('parameters-card').style.display = 'block';
             }
         }
 

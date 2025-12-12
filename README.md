@@ -22,7 +22,7 @@ A production-ready, security-focused web application for discovering accessible 
 8. **robots.txt Analysis** - Auto-parse robots.txt for additional paths
 9. **sitemap.xml Parsing** - Extract URLs from sitemaps for comprehensive coverage
 10. **Authentication Support** - Optional Basic Auth and Bearer Token authentication
-11. **Parameter Discovery** - Built-in wordlist for common URL parameters
+11. **Parameter Discovery** - Tests discovered URLs with common query parameters (?id=, ?page=, ?q=, etc.) to find hidden functionality
 12. **Real-time Progress** - Live progress tracking during scans
 
 ## How to Run
