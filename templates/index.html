@@ -6,344 +6,958 @@
     <title>Web Endpoint Discovery Tool</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2563eb;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #06b6d4;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --success: #22c55e;
+            --success-light: #4ade80;
+            --warning: #f59e0b;
+            --warning-light: #fbbf24;
+            --danger: #ef4444;
+            --danger-light: #f87171;
+            --info: #06b6d4;
+            --purple: #a855f7;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(17, 17, 27, 0.8);
+            --bg-card-hover: rgba(25, 25, 40, 0.9);
+            --border-color: rgba(99, 102, 241, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
         }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
             min-height: 100vh;
-            color: #e2e8f0;
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
-        .card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            backdrop-filter: blur(10px);
+        
+        .bg-gradient-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.3), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(168, 85, 247, 0.15), transparent),
+                radial-gradient(ellipse 50% 30% at 0% 100%, rgba(6, 182, 212, 0.15), transparent);
+            pointer-events: none;
+            z-index: 0;
         }
-        .card-header {
-            background: rgba(51, 65, 85, 0.5);
-            border-bottom: 1px solid rgba(100, 116, 139, 0.3);
+        
+        .main-container {
+            position: relative;
+            z-index: 1;
         }
-        .form-control, .form-select {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            color: #e2e8f0;
+        
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .form-control:focus, .form-select:focus {
-            background: rgba(15, 23, 42, 0.9);
-            border-color: var(--primary-color);
-            color: #e2e8f0;
-            box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+        
+        .glass-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.2);
         }
-        .btn-primary {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
+        
+        .glass-card-static {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
         }
-        .btn-primary:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
-        }
-        .progress {
-            height: 8px;
-            background: rgba(15, 23, 42, 0.8);
-        }
-        .progress-bar {
-            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
-        }
-        .status-success { color: var(--success-color); }
-        .status-redirect { color: var(--warning-color); }
-        .status-forbidden { color: #a855f7; }
-        .status-notfound { color: #6b7280; }
-        .status-error { color: var(--danger-color); }
-        .result-item {
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid rgba(100, 116, 139, 0.2);
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.875rem;
-        }
-        .result-item:hover {
-            background: rgba(51, 65, 85, 0.3);
-        }
-        .status-badge {
-            display: inline-block;
-            min-width: 45px;
+        
+        .header-section {
             text-align: center;
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
+            padding: 3rem 1rem 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 50%, var(--purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .card-header-custom {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-header-custom h5 {
+            margin: 0;
             font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
         }
-        .badge-200 { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
-        .badge-301, .badge-302 { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
-        .badge-403 { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
-        .badge-404 { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
-        .badge-500 { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
-        .tech-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            margin: 0.125rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            background: rgba(6, 182, 212, 0.2);
-            color: var(--info-color);
+        
+        .card-header-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
+            border-radius: 10px;
+            color: var(--primary-light);
         }
-        .stats-card {
-            text-align: center;
+        
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            background: rgba(15, 15, 25, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 10px;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 15, 25, 0.8);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+        
+        .form-select option {
+            background: #1a1a2e;
+            color: var(--text-primary);
+        }
+        
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+        
+        .options-section {
+            background: rgba(15, 15, 25, 0.4);
+            border-radius: 12px;
             padding: 1rem;
+            margin-bottom: 1rem;
         }
-        .stats-number {
+        
+        .options-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+        
+        .form-check {
+            padding-left: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-check-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .form-check-custom:hover {
+            background: rgba(99, 102, 241, 0.08);
+        }
+        
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .form-check-input:checked {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+            border-color: transparent;
+        }
+        
+        .form-check-input:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        .form-check-label {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 400;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .collapsible-trigger {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(15, 15, 25, 0.4);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .collapsible-trigger:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-light);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+        
+        .collapsible-trigger i {
+            font-size: 1rem;
+        }
+        
+        .collapse-content {
+            margin-top: 0.75rem;
+            padding: 1rem;
+            background: rgba(15, 15, 25, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        
+        .btn-scan {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-scan::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-scan:hover::before {
+            left: 100%;
+        }
+        
+        .btn-scan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.6);
+        }
+        
+        .btn-scan:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-scan.scanning {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .progress-card {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .progress-status.scanning i {
+            animation: spin 1s linear infinite;
+        }
+        
+        .progress-status.complete {
+            color: var(--success);
+        }
+        
+        .progress-status.failed {
+            color: var(--danger);
+        }
+        
+        .progress-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .progress-bar-container {
+            height: 8px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--info), var(--purple));
+            background-size: 200% 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: shimmer 2s linear infinite;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.25rem 1rem;
+        }
+        
+        .stat-number {
             font-size: 2rem;
             font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+            margin-bottom: 0.5rem;
         }
-        .stats-label {
+        
+        .stat-number.success { color: var(--success); }
+        .stat-number.warning { color: var(--warning); }
+        .stat-number.purple { color: var(--purple); }
+        .stat-number.danger { color: var(--danger); }
+        
+        .stat-label {
             font-size: 0.75rem;
-            color: #94a3b8;
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
-        #results-container {
+        
+        .results-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .results-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: rgba(15, 15, 25, 0.5);
+            padding: 0.25rem;
+            border-radius: 10px;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-tab:hover {
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .filter-tab.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-export {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: rgba(15, 15, 25, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .btn-export:hover {
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .results-container {
             max-height: 500px;
             overflow-y: auto;
         }
-        .scanning-animation {
-            animation: pulse 2s infinite;
+        
+        .results-container::-webkit-scrollbar {
+            width: 6px;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        .nav-tabs .nav-link {
-            color: #94a3b8;
-            border: none;
-        }
-        .nav-tabs .nav-link.active {
-            color: var(--primary-color);
+        
+        .results-container::-webkit-scrollbar-track {
             background: transparent;
-            border-bottom: 2px solid var(--primary-color);
         }
-        .export-btn {
-            padding: 0.25rem 0.5rem;
+        
+        .results-container::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 3px;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            transition: background 0.2s ease;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .result-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            padding: 0.35rem 0.5rem;
             font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .badge-200 {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--success-light);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .badge-301, .badge-302, .badge-redirect {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-light);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .badge-403 {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        .badge-404 {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+        
+        .badge-500, .badge-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-light);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .result-url {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            word-break: break-all;
+        }
+        
+        .result-url:hover {
+            color: var(--primary-light);
+        }
+        
+        .result-url.success { color: var(--success-light); }
+        .result-url.redirect { color: var(--warning-light); }
+        .result-url.forbidden { color: #c084fc; }
+        .result-url.notfound { color: var(--text-muted); }
+        .result-url.error { color: var(--danger-light); }
+        
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        
+        .badge-soft-404 {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .redirect-arrow {
+            color: var(--text-muted);
+        }
+        
+        .redirect-url {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        .tech-container {
+            padding: 1.5rem;
+        }
+        
+        .tech-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .tech-group-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .tech-version {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        
+        .secondary-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 991px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 575px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid py-4">
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <h1 class="display-5 fw-bold mb-2">
-                    <i class="bi bi-search me-2"></i>Web Endpoint Discovery
-                </h1>
-                <p class="text-secondary">Discover folders, endpoints, and technologies on any web server</p>
+    <div class="bg-gradient-mesh"></div>
+    
+    <div class="main-container">
+        <div class="container-fluid px-4">
+            <div class="header-section">
+                <div class="logo-icon">
+                    <i class="bi bi-radar"></i>
+                </div>
+                <h1 class="main-title">Web Endpoint Discovery</h1>
+                <p class="subtitle">Discover hidden folders, endpoints, and technologies on any web server with advanced scanning capabilities</p>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-lg-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Scan Configuration</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="scan-form">
-                            <div class="mb-3">
-                                <label class="form-label">Target Domain</label>
-                                <input type="text" class="form-control" id="domain" 
-                                       placeholder="example.com" required>
-                                <small class="text-secondary">Enter domain without http/https</small>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="glass-card" style="animation: fadeInUp 0.5s ease-out">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon">
+                                <i class="bi bi-sliders"></i>
                             </div>
+                            <h5>Scan Configuration</h5>
+                        </div>
+                        <div class="card-body-custom">
+                            <form id="scan-form">
+                                <div class="mb-4">
+                                    <label class="form-label">Target Domain</label>
+                                    <input type="text" class="form-control" id="domain" 
+                                           placeholder="example.com" required>
+                                    <div class="form-hint">Enter domain without http/https prefix</div>
+                                </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Wordlist</label>
-                                <select class="form-select" id="wordlist">
-                                    <option value="all">All Paths (Comprehensive)</option>
-                                    <option value="directories">Directories Only</option>
-                                    <option value="api">API Endpoints</option>
-                                    <option value="hidden">Hidden/Sensitive Files</option>
-                                    <option value="files">Common Files</option>
-                                    <option value="backup">Backup Files</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Discovery Options</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="parse-robots" checked>
-                                    <label class="form-check-label" for="parse-robots">
-                                        Parse robots.txt
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="parse-sitemap" checked>
-                                    <label class="form-check-label" for="parse-sitemap">
-                                        Parse sitemap.xml
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="recursive">
-                                    <label class="form-check-label" for="recursive">
-                                        Recursive Discovery
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="scan-subdomains">
-                                    <label class="form-check-label" for="scan-subdomains">
-                                        Enumerate Subdomains
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="scan-parameters">
-                                    <label class="form-check-label" for="scan-parameters">
-                                        Parameter Discovery
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3" id="recursive-depth-container" style="display: none;">
-                                <label class="form-label">Recursive Depth</label>
-                                <select class="form-select" id="recursive-depth">
-                                    <option value="1">1 Level</option>
-                                    <option value="2" selected>2 Levels</option>
-                                    <option value="3">3 Levels</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <a class="text-decoration-none" data-bs-toggle="collapse" href="#auth-section">
-                                    <i class="bi bi-lock me-1"></i>Authentication (Optional)
-                                </a>
-                                <div class="collapse mt-2" id="auth-section">
-                                    <select class="form-select mb-2" id="auth-type">
-                                        <option value="">No Authentication</option>
-                                        <option value="basic">Basic Auth (user:pass)</option>
-                                        <option value="bearer">Bearer Token</option>
+                                <div class="mb-4">
+                                    <label class="form-label">Wordlist Type</label>
+                                    <select class="form-select" id="wordlist">
+                                        <option value="all">All Paths (Comprehensive)</option>
+                                        <option value="directories">Directories Only</option>
+                                        <option value="api">API Endpoints</option>
+                                        <option value="hidden">Hidden/Sensitive Files</option>
+                                        <option value="files">Common Files</option>
+                                        <option value="backup">Backup Files</option>
                                     </select>
-                                    <input type="text" class="form-control" id="auth-value" 
-                                           placeholder="user:password or token">
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <a class="text-decoration-none" data-bs-toggle="collapse" href="#custom-wordlist-section">
-                                    <i class="bi bi-list-ul me-1"></i>Custom Paths (Optional)
-                                </a>
-                                <div class="collapse mt-2" id="custom-wordlist-section">
-                                    <textarea class="form-control" id="custom-wordlist" rows="4"
-                                              placeholder="Enter custom paths, one per line&#10;admin&#10;api/v2&#10;secret"></textarea>
+                                <div class="options-section">
+                                    <div class="options-title">Discovery Options</div>
+                                    
+                                    <label class="form-check-custom">
+                                        <input class="form-check-input" type="checkbox" id="parse-robots" checked>
+                                        <span class="form-check-label">Parse robots.txt</span>
+                                    </label>
+                                    
+                                    <label class="form-check-custom">
+                                        <input class="form-check-input" type="checkbox" id="parse-sitemap" checked>
+                                        <span class="form-check-label">Parse sitemap.xml</span>
+                                    </label>
+                                    
+                                    <label class="form-check-custom">
+                                        <input class="form-check-input" type="checkbox" id="recursive">
+                                        <span class="form-check-label">Recursive Discovery</span>
+                                    </label>
+                                    
+                                    <label class="form-check-custom">
+                                        <input class="form-check-input" type="checkbox" id="scan-subdomains">
+                                        <span class="form-check-label">Enumerate Subdomains</span>
+                                    </label>
+                                    
+                                    <label class="form-check-custom">
+                                        <input class="form-check-input" type="checkbox" id="scan-parameters">
+                                        <span class="form-check-label">Parameter Discovery</span>
+                                    </label>
                                 </div>
+
+                                <div class="mb-3" id="recursive-depth-container" style="display: none;">
+                                    <label class="form-label">Recursive Depth</label>
+                                    <select class="form-select" id="recursive-depth">
+                                        <option value="1">1 Level</option>
+                                        <option value="2" selected>2 Levels</option>
+                                        <option value="3">3 Levels</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <a class="collapsible-trigger" data-bs-toggle="collapse" href="#auth-section">
+                                        <i class="bi bi-shield-lock"></i>
+                                        <span>Authentication (Optional)</span>
+                                    </a>
+                                    <div class="collapse" id="auth-section">
+                                        <div class="collapse-content">
+                                            <select class="form-select mb-3" id="auth-type">
+                                                <option value="">No Authentication</option>
+                                                <option value="basic">Basic Auth (user:pass)</option>
+                                                <option value="bearer">Bearer Token</option>
+                                            </select>
+                                            <input type="text" class="form-control" id="auth-value" 
+                                                   placeholder="user:password or token">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <a class="collapsible-trigger" data-bs-toggle="collapse" href="#custom-wordlist-section">
+                                        <i class="bi bi-list-stars"></i>
+                                        <span>Custom Paths (Optional)</span>
+                                    </a>
+                                    <div class="collapse" id="custom-wordlist-section">
+                                        <div class="collapse-content">
+                                            <textarea class="form-control" id="custom-wordlist" rows="4"
+                                                      placeholder="Enter custom paths, one per line&#10;admin&#10;api/v2&#10;secret"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-scan" id="scan-btn">
+                                    <i class="bi bi-play-fill"></i>
+                                    <span>Start Scan</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="glass-card-static mb-4 progress-card" id="progress-card" style="display: none;">
+                        <div class="card-body-custom">
+                            <div class="progress-header">
+                                <div class="progress-status scanning" id="scan-status">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    <span>Scanning...</span>
+                                </div>
+                                <div class="progress-count" id="scan-progress-text">0 / 0</div>
                             </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <button type="submit" class="btn btn-primary w-100" id="scan-btn">
-                                <i class="bi bi-play-fill me-1"></i>Start Scan
-                            </button>
-                        </form>
+                    <div class="stats-grid mb-4" id="stats-row" style="display: none;">
+                        <div class="glass-card stat-card">
+                            <div class="stat-number success" id="stat-success">0</div>
+                            <div class="stat-label">Found</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number warning" id="stat-redirect">0</div>
+                            <div class="stat-label">Redirects</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number purple" id="stat-forbidden">0</div>
+                            <div class="stat-label">Forbidden</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-number danger" id="stat-error">0</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="col-lg-8">
-                <div class="card mb-4" id="progress-card" style="display: none;">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span id="scan-status" class="scanning-animation">
-                                <i class="bi bi-arrow-repeat me-1"></i>Scanning...
-                            </span>
-                            <span id="scan-progress-text">0 / 0</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4" id="stats-row" style="display: none;">
-                    <div class="col-3">
-                        <div class="card stats-card">
-                            <div class="stats-number status-success" id="stat-success">0</div>
-                            <div class="stats-label">Found</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="card stats-card">
-                            <div class="stats-number status-redirect" id="stat-redirect">0</div>
-                            <div class="stats-label">Redirects</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="card stats-card">
-                            <div class="stats-number status-forbidden" id="stat-forbidden">0</div>
-                            <div class="stats-label">Forbidden</div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="card stats-card">
-                            <div class="stats-number status-error" id="stat-error">0</div>
-                            <div class="stats-label">Errors</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card" id="results-card" style="display: none;">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <ul class="nav nav-tabs card-header-tabs" id="results-tabs">
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#" data-filter="all">All</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" data-filter="success">Found</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" data-filter="redirect">Redirects</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" data-filter="forbidden">Forbidden</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" data-filter="tech">Technologies</a>
-                                </li>
-                            </ul>
-                            <div class="btn-group">
-                                <button class="btn btn-outline-light export-btn" id="export-json">
+                    <div class="glass-card-static results-card" id="results-card" style="display: none;">
+                        <div class="results-header">
+                            <div class="filter-tabs" id="results-tabs">
+                                <button class="filter-tab active" data-filter="all">All</button>
+                                <button class="filter-tab" data-filter="success">Found</button>
+                                <button class="filter-tab" data-filter="redirect">Redirects</button>
+                                <button class="filter-tab" data-filter="forbidden">Forbidden</button>
+                                <button class="filter-tab" data-filter="tech">Technologies</button>
+                            </div>
+                            <div class="export-buttons">
+                                <button class="btn-export" id="export-json">
                                     <i class="bi bi-filetype-json"></i> JSON
                                 </button>
-                                <button class="btn btn-outline-light export-btn" id="export-csv">
+                                <button class="btn-export" id="export-csv">
                                     <i class="bi bi-filetype-csv"></i> CSV
                                 </button>
-                                <button class="btn btn-outline-light export-btn" id="export-txt">
-                                    <i class="bi bi-filetype-txt"></i> TXT
+                                <button class="btn-export" id="export-txt">
+                                    <i class="bi bi-file-text"></i> TXT
                                 </button>
                             </div>
                         </div>
+                        <div class="results-container" id="results-container"></div>
+                        <div class="tech-container" id="tech-container" style="display: none;"></div>
                     </div>
-                    <div class="card-body p-0">
-                        <div id="results-container"></div>
-                        <div id="tech-container" style="display: none;" class="p-3"></div>
-                    </div>
-                </div>
 
-                <div class="card mt-4" id="subdomains-card" style="display: none;">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Discovered Subdomains</h5>
+                    <div class="glass-card-static secondary-card mt-4" id="subdomains-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                            <h5>Discovered Subdomains</h5>
+                        </div>
+                        <div class="results-container" id="subdomains-container"></div>
                     </div>
-                    <div class="card-body p-0">
-                        <div id="subdomains-container"></div>
-                    </div>
-                </div>
 
-                <div class="card mt-4" id="parameters-card" style="display: none;">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-braces me-2"></i>Discovered Parameters</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div id="parameters-container"></div>
+                    <div class="glass-card-static secondary-card mt-4" id="parameters-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon">
+                                <i class="bi bi-braces"></i>
+                            </div>
+                            <h5>Discovered Parameters</h5>
+                        </div>
+                        <div class="results-container" id="parameters-container"></div>
                     </div>
                 </div>
             </div>
@@ -385,13 +999,20 @@
                 custom_wordlist: customWords
             };
 
-            document.getElementById('scan-btn').disabled = true;
-            document.getElementById('scan-btn').innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Scanning...';
+            const scanBtn = document.getElementById('scan-btn');
+            scanBtn.disabled = true;
+            scanBtn.classList.add('scanning');
+            scanBtn.innerHTML = '<i class="bi bi-hourglass-split"></i><span>Scanning...</span>';
+            
             document.getElementById('progress-card').style.display = 'block';
             document.getElementById('stats-row').style.display = 'none';
             document.getElementById('results-card').style.display = 'none';
             document.getElementById('subdomains-card').style.display = 'none';
             document.getElementById('parameters-card').style.display = 'none';
+
+            const statusEl = document.getElementById('scan-status');
+            statusEl.className = 'progress-status scanning';
+            statusEl.innerHTML = '<i class="bi bi-arrow-repeat"></i><span>Scanning...</span>';
 
             try {
                 const startRes = await fetch('/api/scan', {
@@ -433,18 +1054,17 @@
                     displayParameters(resultsData.parameters);
                 }
 
-                document.getElementById('scan-status').innerHTML = 
-                    '<i class="bi bi-check-circle me-1"></i>Scan Complete';
-                document.getElementById('scan-status').classList.remove('scanning-animation');
+                statusEl.className = 'progress-status complete';
+                statusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Scan Complete</span>';
 
             } catch (error) {
                 alert('Scan error: ' + error.message);
-                document.getElementById('scan-status').innerHTML = 
-                    '<i class="bi bi-x-circle me-1"></i>Scan Failed';
+                statusEl.className = 'progress-status failed';
+                statusEl.innerHTML = '<i class="bi bi-x-circle-fill"></i><span>Scan Failed</span>';
             } finally {
-                document.getElementById('scan-btn').disabled = false;
-                document.getElementById('scan-btn').innerHTML = 
-                    '<i class="bi bi-play-fill me-1"></i>Start Scan';
+                scanBtn.disabled = false;
+                scanBtn.classList.remove('scanning');
+                scanBtn.innerHTML = '<i class="bi bi-play-fill"></i><span>Start Scan</span>';
             }
         });
 
@@ -454,43 +1074,51 @@
 
             let successCount = 0, redirectCount = 0, forbiddenCount = 0, errorCount = 0;
 
-            results.forEach(r => {
+            results.forEach((r, index) => {
                 const status = r.status_code;
                 let badgeClass = 'badge-404';
-                let statusClass = 'status-notfound';
+                let urlClass = 'notfound';
+                let type = 'other';
 
                 if (status >= 200 && status < 300 && !r.is_soft_404) {
                     badgeClass = 'badge-200';
-                    statusClass = 'status-success';
+                    urlClass = 'success';
+                    type = 'success';
                     successCount++;
                 } else if (status >= 300 && status < 400) {
                     badgeClass = 'badge-301';
-                    statusClass = 'status-redirect';
+                    urlClass = 'redirect';
+                    type = 'redirect';
                     redirectCount++;
                 } else if (status === 403) {
                     badgeClass = 'badge-403';
-                    statusClass = 'status-forbidden';
+                    urlClass = 'forbidden';
+                    type = 'forbidden';
                     forbiddenCount++;
                 } else if (status >= 500 || r.error) {
                     badgeClass = 'badge-500';
-                    statusClass = 'status-error';
+                    urlClass = 'error';
+                    type = 'error';
                     errorCount++;
                 }
 
                 const item = document.createElement('div');
-                item.className = `result-item ${statusClass}`;
+                item.className = 'result-item';
                 item.dataset.status = status;
-                item.dataset.type = getStatusType(status, r.is_soft_404, r.error);
+                item.dataset.type = type;
+                item.style.animationDelay = `${index * 0.02}s`;
                 
-                let html = `<span class="status-badge ${badgeClass}">${status || 'ERR'}</span> `;
-                html += `<a href="${r.url}" target="_blank" class="text-decoration-none ${statusClass}">${r.url}</a>`;
+                let html = `<span class="status-badge ${badgeClass}">${status || 'ERR'}</span>`;
+                html += `<a href="${r.url}" target="_blank" class="result-url ${urlClass}">${r.url}</a>`;
                 
-                if (r.redirect_url) {
-                    html += ` <i class="bi bi-arrow-right text-secondary"></i> <small class="text-secondary">${r.redirect_url}</small>`;
-                }
+                html += '<div class="result-meta">';
                 if (r.is_soft_404) {
-                    html += ` <span class="badge bg-warning text-dark">Soft 404</span>`;
+                    html += '<span class="badge-soft-404">Soft 404</span>';
                 }
+                if (r.redirect_url) {
+                    html += `<i class="bi bi-arrow-right redirect-arrow"></i><span class="redirect-url">${r.redirect_url}</span>`;
+                }
+                html += '</div>';
                 
                 item.innerHTML = html;
                 container.appendChild(item);
@@ -501,48 +1129,43 @@
             document.getElementById('stat-forbidden').textContent = forbiddenCount;
             document.getElementById('stat-error').textContent = errorCount;
 
-            document.getElementById('stats-row').style.display = 'flex';
+            document.getElementById('stats-row').style.display = 'grid';
             document.getElementById('results-card').style.display = 'block';
             document.getElementById('progress-bar').style.width = '100%';
             document.getElementById('scan-progress-text').textContent = 
                 `${results.length} / ${results.length}`;
         }
 
-        function getStatusType(status, isSoft404, error) {
-            if (error) return 'error';
-            if (isSoft404) return 'notfound';
-            if (status >= 200 && status < 300) return 'success';
-            if (status >= 300 && status < 400) return 'redirect';
-            if (status === 403) return 'forbidden';
-            return 'other';
-        }
-
         function displayTechnologies(techs) {
             const container = document.getElementById('tech-container');
             if (!techs || techs.length === 0) {
-                container.innerHTML = '<p class="text-secondary">No technologies detected</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-code-slash"></i>
+                        <p>No technologies detected</p>
+                    </div>
+                `;
                 return;
             }
 
-            let html = '<div class="row">';
-            
             const grouped = {};
             techs.forEach(t => {
                 if (!grouped[t.category]) grouped[t.category] = [];
                 grouped[t.category].push(t);
             });
 
+            let html = '<div class="row">';
             for (const [category, items] of Object.entries(grouped)) {
-                html += `<div class="col-md-6 mb-3">`;
-                html += `<h6 class="text-uppercase text-secondary mb-2">${category}</h6>`;
+                html += '<div class="col-md-6 tech-group">';
+                html += `<div class="tech-group-title">${category}</div>`;
+                html += '<div class="tech-badges">';
                 items.forEach(t => {
                     html += `<span class="tech-badge">${t.name}`;
-                    if (t.version) html += ` v${t.version}`;
-                    html += `</span>`;
+                    if (t.version) html += `<span class="tech-version">v${t.version}</span>`;
+                    html += '</span>';
                 });
-                html += `</div>`;
+                html += '</div></div>';
             }
-            
             html += '</div>';
             container.innerHTML = html;
         }
@@ -551,13 +1174,17 @@
             const container = document.getElementById('subdomains-container');
             container.innerHTML = '';
 
-            subdomains.forEach(s => {
+            subdomains.forEach((s, index) => {
                 const item = document.createElement('div');
                 item.className = 'result-item';
+                item.style.animationDelay = `${index * 0.02}s`;
                 item.innerHTML = `
-                    <strong class="status-success">${s.full_domain}</strong>
-                    ${s.ip_addresses.length ? `<span class="text-secondary ms-2">${s.ip_addresses.join(', ')}</span>` : ''}
-                    ${s.cname ? `<span class="text-secondary ms-2">CNAME: ${s.cname}</span>` : ''}
+                    <span class="status-badge badge-200">DNS</span>
+                    <span class="result-url success">${s.full_domain}</span>
+                    <div class="result-meta">
+                        ${s.ip_addresses.length ? `<span class="redirect-url">${s.ip_addresses.join(', ')}</span>` : ''}
+                        ${s.cname ? `<span class="redirect-url">CNAME: ${s.cname}</span>` : ''}
+                    </div>
                 `;
                 container.appendChild(item);
             });
@@ -571,16 +1198,19 @@
             const container = document.getElementById('parameters-container');
             container.innerHTML = '';
 
-            params.forEach(p => {
+            params.forEach((p, index) => {
                 const item = document.createElement('div');
                 item.className = 'result-item';
-                const diffBadge = p.is_different ? '<span class="badge bg-warning text-dark ms-2">Response Changed</span>' : '';
+                item.style.animationDelay = `${index * 0.02}s`;
+                const diffBadge = p.is_different ? '<span class="badge-soft-404" style="background: rgba(34,197,94,0.2); color: #22c55e;">Response Changed</span>' : '';
                 item.innerHTML = `
                     <span class="status-badge badge-200">${p.status_code}</span>
-                    <code class="text-info ms-2">?${p.parameter}=${p.value}</code>
-                    <a href="${p.url}" target="_blank" class="text-decoration-none status-success ms-2">${p.base_url}</a>
-                    ${diffBadge}
-                    <small class="text-secondary ms-2">(${p.content_length} bytes)</small>
+                    <code style="color: var(--info); background: rgba(6,182,212,0.1); padding: 0.25rem 0.5rem; border-radius: 4px;">?${p.parameter}=${p.value}</code>
+                    <a href="${p.url}" target="_blank" class="result-url success">${p.base_url}</a>
+                    <div class="result-meta">
+                        ${diffBadge}
+                        <span class="redirect-url">${p.content_length} bytes</span>
+                    </div>
                 `;
                 container.appendChild(item);
             });
@@ -590,12 +1220,10 @@
             }
         }
 
-        document.querySelectorAll('#results-tabs .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelectorAll('#results-tabs .nav-link').forEach(l => 
-                    l.classList.remove('active'));
+        document.querySelectorAll('#results-tabs .filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#results-tabs .filter-tab').forEach(t => 
+                    t.classList.remove('active'));
                 this.classList.add('active');
 
                 const filter = this.dataset.filter;
@@ -609,12 +1237,12 @@
                 document.getElementById('results-container').style.display = 'block';
                 document.getElementById('tech-container').style.display = 'none';
 
-                const items = document.querySelectorAll('.result-item');
+                const items = document.querySelectorAll('#results-container .result-item');
                 items.forEach(item => {
                     if (filter === 'all') {
-                        item.style.display = 'block';
+                        item.style.display = 'flex';
                     } else {
-                        item.style.display = item.dataset.type === filter ? 'block' : 'none';
+                        item.style.display = item.dataset.type === filter ? 'flex' : 'none';
                     }
                 });
             });
