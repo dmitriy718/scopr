@@ -14,6 +14,21 @@ import time
 import re
 
 
+DIRECTORY_LISTING_PATTERNS = [
+    r"Index of /",
+    r"Directory listing for",
+    r"<title>Index of",
+    r"Parent Directory</a>",
+    r"\[To Parent Directory\]",
+    r"<h1>Directory listing",
+    r"mod_autoindex",
+    r"<pre><a href=\"\?",
+    r"<address>Apache/",
+    r"lighttpd/",
+    r"nginx/\d",
+]
+
+
 @dataclass
 class ScanResult:
     """Represents the result of scanning a single URL."""
@@ -23,6 +38,7 @@ class ScanResult:
     redirect_url: Optional[str] = None
     headers: Dict[str, str] = field(default_factory=dict)
     is_soft_404: bool = False
+    is_directory_listing: bool = False
     response_time: float = 0.0
     error: Optional[str] = None
 
@@ -34,6 +50,7 @@ class ScanResult:
             "content_length": self.content_length,
             "redirect_url": self.redirect_url,
             "is_soft_404": self.is_soft_404,
+            "is_directory_listing": self.is_directory_listing,
             "response_time": round(self.response_time, 3),
             "error": self.error
         }
@@ -184,6 +201,25 @@ class AsyncScanner:
 
         return False
 
+    def is_directory_listing(self, content: str, status_code: int) -> bool:
+        """
+        Detect if a response is a directory listing.
+        
+        Args:
+            content: Response body content
+            status_code: HTTP status code
+            
+        Returns:
+            True if the response appears to be a directory listing
+        """
+        if status_code != 200:
+            return False
+            
+        for pattern in DIRECTORY_LISTING_PATTERNS:
+            if re.search(pattern, content, re.IGNORECASE):
+                return True
+        return False
+
     async def scan_url(self, url: str) -> ScanResult:
         """
         Scan a single URL and return the result.
@@ -224,6 +260,7 @@ class AsyncScanner:
                         redirect_url=redirect_url,
                         headers=headers_dict,
                         is_soft_404=self.is_soft_404(content, response.status),
+                        is_directory_listing=self.is_directory_listing(content, response.status),
                         response_time=response_time
                     )
                     

@@ -21,6 +21,7 @@ from src.fingerprint import TechnologyFingerprinter
 from src.subdomain import SubdomainEnumerator
 from src.exporter import ResultExporter, export_results
 from src.parameters import ParameterScanner, discover_parameters
+from src.security import SecurityAnalyzer
 
 load_dotenv()
 
@@ -179,6 +180,7 @@ async def run_scan(scan_data: dict) -> List[dict]:
 
     wordlist_manager = WordlistManager()
     fingerprinter = TechnologyFingerprinter()
+    security_analyzer = SecurityAnalyzer()
 
     wordlist_type = options.get("wordlist", "all")
     paths = wordlist_manager.get_builtin_wordlist(wordlist_type)
@@ -223,7 +225,14 @@ async def run_scan(scan_data: dict) -> List[dict]:
 
         results = await scanner.scan_urls(urls, progress_callback)
 
+        for result in results:
+            if result.headers:
+                security_analyzer.analyze_headers(result.headers, result.url)
+            if result.is_directory_listing and result.url not in security_analyzer.directory_listings:
+                security_analyzer.directory_listings.append(result.url)
+
         scan_data["technologies"] = fingerprinter.get_all_detected()
+        scan_data["security"] = security_analyzer.get_analysis().to_dict()
 
     if options.get("scan_subdomains", False):
         try:
@@ -300,6 +309,7 @@ def get_scan_results(scan_id: str):
         "technologies": scan_data.get("technologies", []),
         "subdomains": scan_data.get("subdomains", []),
         "parameters": scan_data.get("parameters", []),
+        "security": scan_data.get("security", {}),
         "total": len(results)
     })
 

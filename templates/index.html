@@ -732,6 +732,160 @@
             opacity: 0.5;
         }
         
+        .security-grade {
+            margin-left: auto;
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #22c55e, #4ade80);
+            color: #0a0a0f;
+        }
+        
+        .grade-aplus, .grade-a { background: linear-gradient(135deg, #22c55e, #4ade80); }
+        .grade-b { background: linear-gradient(135deg, #84cc16, #a3e635); }
+        .grade-c { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+        .grade-d { background: linear-gradient(135deg, #f97316, #fb923c); }
+        .grade-f { background: linear-gradient(135deg, #ef4444, #f87171); }
+        
+        .security-score-bar {
+            height: 4px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 2px;
+            margin: 0 1.5rem 1rem;
+            overflow: hidden;
+        }
+        
+        .security-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+        
+        .security-section {
+            margin-bottom: 1rem;
+        }
+        
+        .security-section-title {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: rgba(99, 102, 241, 0.05);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .security-section-title i {
+            color: var(--warning);
+        }
+        
+        .security-header-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .security-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .exposed-value {
+            font-size: 0.8rem;
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+        
+        .security-good {
+            padding: 2rem;
+            text-align: center;
+            color: var(--success-light);
+            font-size: 1rem;
+        }
+        
+        .security-good i {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }
+        
+        .security-icon i {
+            color: var(--success-light);
+        }
+        
+        .badge-directory-listing {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .response-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .scan-stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: rgba(99, 102, 241, 0.03);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        
+        .stat-mini {
+            text-align: center;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-mini-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .sort-select {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(15, 15, 25, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .sort-select option {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+        
         @media (max-width: 991px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -916,6 +1070,24 @@
                     </div>
 
                     <div class="glass-card-static results-card" id="results-card" style="display: none;">
+                        <div class="scan-stats-summary" id="scan-stats-summary">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="stat-total-scanned">0</div>
+                                <div class="stat-mini-label">Scanned</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="stat-duration">0s</div>
+                                <div class="stat-mini-label">Duration</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="stat-req-sec">0</div>
+                                <div class="stat-mini-label">Req/Sec</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="stat-avg-time">0ms</div>
+                                <div class="stat-mini-label">Avg Time</div>
+                            </div>
+                        </div>
                         <div class="results-header">
                             <div class="filter-tabs" id="results-tabs">
                                 <button class="filter-tab active" data-filter="all">All</button>
@@ -924,6 +1096,13 @@
                                 <button class="filter-tab" data-filter="forbidden">Forbidden</button>
                                 <button class="filter-tab" data-filter="tech">Technologies</button>
                             </div>
+                            <select class="sort-select" id="sort-select">
+                                <option value="default">Default Order</option>
+                                <option value="status">By Status Code</option>
+                                <option value="time-asc">Fastest First</option>
+                                <option value="time-desc">Slowest First</option>
+                                <option value="size-desc">Largest First</option>
+                            </select>
                             <div class="export-buttons">
                                 <button class="btn-export" id="export-json">
                                     <i class="bi bi-filetype-json"></i> JSON
@@ -959,6 +1138,20 @@
                         </div>
                         <div class="results-container" id="parameters-container"></div>
                     </div>
+
+                    <div class="glass-card-static secondary-card mt-4" id="security-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon security-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <h5>Security Analysis</h5>
+                            <div class="security-grade" id="security-grade">A+</div>
+                        </div>
+                        <div class="security-score-bar">
+                            <div class="security-score-fill" id="security-score-bar" style="width: 100%"></div>
+                        </div>
+                        <div class="results-container" id="security-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -969,6 +1162,25 @@
         let currentScanId = null;
         let allResults = [];
         let technologies = [];
+        let scanStartTime = null;
+        let scanEndTime = null;
+
+        document.getElementById('sort-select').addEventListener('change', function() {
+            const sortBy = this.value;
+            let sorted = [...allResults];
+            
+            if (sortBy === 'status') {
+                sorted.sort((a, b) => a.status_code - b.status_code);
+            } else if (sortBy === 'time-asc') {
+                sorted.sort((a, b) => (a.response_time || 0) - (b.response_time || 0));
+            } else if (sortBy === 'time-desc') {
+                sorted.sort((a, b) => (b.response_time || 0) - (a.response_time || 0));
+            } else if (sortBy === 'size-desc') {
+                sorted.sort((a, b) => (b.content_length || 0) - (a.content_length || 0));
+            }
+            
+            displayResults(sorted, false);
+        });
 
         document.getElementById('recursive').addEventListener('change', function() {
             document.getElementById('recursive-depth-container').style.display = 
@@ -1009,10 +1221,13 @@
             document.getElementById('results-card').style.display = 'none';
             document.getElementById('subdomains-card').style.display = 'none';
             document.getElementById('parameters-card').style.display = 'none';
+            document.getElementById('security-card').style.display = 'none';
 
             const statusEl = document.getElementById('scan-status');
             statusEl.className = 'progress-status scanning';
             statusEl.innerHTML = '<i class="bi bi-arrow-repeat"></i><span>Scanning...</span>';
+
+            scanStartTime = Date.now();
 
             try {
                 const startRes = await fetch('/api/scan', {
@@ -1054,6 +1269,10 @@
                     displayParameters(resultsData.parameters);
                 }
 
+                if (resultsData.security) {
+                    displaySecurityAnalysis(resultsData.security);
+                }
+
                 statusEl.className = 'progress-status complete';
                 statusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Scan Complete</span>';
 
@@ -1068,17 +1287,20 @@
             }
         });
 
-        function displayResults(results) {
+        function displayResults(results, updateStats = true) {
             const container = document.getElementById('results-container');
             container.innerHTML = '';
 
             let successCount = 0, redirectCount = 0, forbiddenCount = 0, errorCount = 0;
+            let totalResponseTime = 0;
 
             results.forEach((r, index) => {
                 const status = r.status_code;
                 let badgeClass = 'badge-404';
                 let urlClass = 'notfound';
                 let type = 'other';
+
+                totalResponseTime += r.response_time || 0;
 
                 if (status >= 200 && status < 300 && !r.is_soft_404) {
                     badgeClass = 'badge-200';
@@ -1112,11 +1334,17 @@
                 html += `<a href="${r.url}" target="_blank" class="result-url ${urlClass}">${r.url}</a>`;
                 
                 html += '<div class="result-meta">';
+                if (r.is_directory_listing) {
+                    html += '<span class="badge-directory-listing"><i class="bi bi-folder2-open"></i> Directory Listing</span>';
+                }
                 if (r.is_soft_404) {
                     html += '<span class="badge-soft-404">Soft 404</span>';
                 }
                 if (r.redirect_url) {
                     html += `<i class="bi bi-arrow-right redirect-arrow"></i><span class="redirect-url">${r.redirect_url}</span>`;
+                }
+                if (r.response_time) {
+                    html += `<span class="response-time">${(r.response_time * 1000).toFixed(0)}ms</span>`;
                 }
                 html += '</div>';
                 
@@ -1124,16 +1352,43 @@
                 container.appendChild(item);
             });
 
-            document.getElementById('stat-success').textContent = successCount;
-            document.getElementById('stat-redirect').textContent = redirectCount;
-            document.getElementById('stat-forbidden').textContent = forbiddenCount;
-            document.getElementById('stat-error').textContent = errorCount;
+            if (updateStats) {
+                scanEndTime = Date.now();
+                const durationSec = (scanEndTime - scanStartTime) / 1000;
+                const reqPerSec = durationSec > 0 ? (results.length / durationSec).toFixed(1) : 0;
+                const avgTime = results.length > 0 ? ((totalResponseTime / results.length) * 1000).toFixed(0) : 0;
+
+                document.getElementById('stat-total-scanned').textContent = results.length;
+                document.getElementById('stat-duration').textContent = durationSec.toFixed(1) + 's';
+                document.getElementById('stat-req-sec').textContent = reqPerSec;
+                document.getElementById('stat-avg-time').textContent = avgTime + 'ms';
+
+                document.getElementById('stat-success').textContent = successCount;
+                document.getElementById('stat-redirect').textContent = redirectCount;
+                document.getElementById('stat-forbidden').textContent = forbiddenCount;
+                document.getElementById('stat-error').textContent = errorCount;
+
+                saveScanHistory(document.getElementById('domain').value, results.length, successCount);
+            }
 
             document.getElementById('stats-row').style.display = 'grid';
             document.getElementById('results-card').style.display = 'block';
             document.getElementById('progress-bar').style.width = '100%';
             document.getElementById('scan-progress-text').textContent = 
                 `${results.length} / ${results.length}`;
+        }
+
+        function saveScanHistory(domain, totalScanned, found) {
+            try {
+                const history = JSON.parse(localStorage.getItem('scanHistory') || '[]');
+                history.unshift({
+                    domain: domain,
+                    date: new Date().toISOString(),
+                    scanned: totalScanned,
+                    found: found
+                });
+                localStorage.setItem('scanHistory', JSON.stringify(history.slice(0, 10)));
+            } catch (e) {}
         }
 
         function displayTechnologies(techs) {
@@ -1218,6 +1473,94 @@
             if (params.length > 0) {
                 document.getElementById('parameters-card').style.display = 'block';
             }
+        }
+
+        function displaySecurityAnalysis(security) {
+            const container = document.getElementById('security-container');
+            container.innerHTML = '';
+
+            const gradeEl = document.getElementById('security-grade');
+            const scoreBar = document.getElementById('security-score-bar');
+            
+            gradeEl.textContent = security.grade;
+            gradeEl.className = 'security-grade grade-' + security.grade.replace('+', 'plus').toLowerCase();
+            scoreBar.style.width = security.score + '%';
+            
+            if (security.score >= 80) {
+                scoreBar.style.background = 'linear-gradient(90deg, #22c55e, #4ade80)';
+            } else if (security.score >= 60) {
+                scoreBar.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+            } else {
+                scoreBar.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+            }
+
+            if (security.missing_headers && security.missing_headers.length > 0) {
+                const section = document.createElement('div');
+                section.className = 'security-section';
+                section.innerHTML = '<div class="security-section-title"><i class="bi bi-exclamation-triangle"></i> Missing Security Headers</div>';
+                
+                security.missing_headers.forEach((h, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item security-issue';
+                    item.style.animationDelay = `${index * 0.02}s`;
+                    const severityClass = h.severity === 'high' ? 'badge-500' : (h.severity === 'medium' ? 'badge-403' : 'badge-301');
+                    item.innerHTML = `
+                        <span class="status-badge ${severityClass}">${h.severity.toUpperCase()}</span>
+                        <span class="security-header-name">${h.header}</span>
+                        <div class="result-meta">
+                            <span class="security-desc">${h.description}</span>
+                        </div>
+                    `;
+                    section.appendChild(item);
+                });
+                container.appendChild(section);
+            }
+
+            if (security.dangerous_headers && security.dangerous_headers.length > 0) {
+                const section = document.createElement('div');
+                section.className = 'security-section';
+                section.innerHTML = '<div class="security-section-title"><i class="bi bi-eye"></i> Information Disclosure</div>';
+                
+                security.dangerous_headers.forEach((h, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item security-issue';
+                    item.style.animationDelay = `${index * 0.02}s`;
+                    item.innerHTML = `
+                        <span class="status-badge badge-301">${h.severity.toUpperCase()}</span>
+                        <span class="security-header-name">${h.header}</span>
+                        <code class="exposed-value">${h.value || ''}</code>
+                        <div class="result-meta">
+                            <span class="security-desc">${h.recommendation}</span>
+                        </div>
+                    `;
+                    section.appendChild(item);
+                });
+                container.appendChild(section);
+            }
+
+            if (security.directory_listings && security.directory_listings.length > 0) {
+                const section = document.createElement('div');
+                section.className = 'security-section';
+                section.innerHTML = '<div class="security-section-title"><i class="bi bi-folder2-open"></i> Directory Listings Exposed</div>';
+                
+                security.directory_listings.forEach((url, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item security-issue';
+                    item.style.animationDelay = `${index * 0.02}s`;
+                    item.innerHTML = `
+                        <span class="status-badge badge-500">CRITICAL</span>
+                        <a href="${url}" target="_blank" class="result-url error">${url}</a>
+                    `;
+                    section.appendChild(item);
+                });
+                container.appendChild(section);
+            }
+
+            if (security.total_issues === 0) {
+                container.innerHTML = '<div class="security-good"><i class="bi bi-shield-check"></i> No security issues detected</div>';
+            }
+
+            document.getElementById('security-card').style.display = 'block';
         }
 
         document.querySelectorAll('#results-tabs .filter-tab').forEach(tab => {
