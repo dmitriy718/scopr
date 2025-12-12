@@ -43,7 +43,7 @@ def get_config() -> dict:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         ),
         "verify_ssl": os.environ.get("VERIFY_SSL", "false").lower() == "true",
-        "max_urls": int(os.environ.get("MAX_URLS", "1000")),
+        "max_urls": int(os.environ.get("MAX_URLS", "300")),
         "recursive_depth": int(os.environ.get("RECURSIVE_DEPTH", "2"))
     }
 
@@ -215,19 +215,13 @@ async def run_scan(scan_data: dict) -> List[dict]:
 
         scan_data["total"] = len(urls)
 
-        results = []
-        completed = 0
+        def progress_callback(completed, total, result):
+            scan_data["progress"] = completed
+            if result and result.status_code == 200:
+                fingerprinter.analyze_headers(result.headers)
+                fingerprinter.analyze_url(result.url, result.status_code)
 
-        for url in urls:
-            result = await scanner.scan_url(url)
-            if result:
-                results.append(result)
-                completed += 1
-                scan_data["progress"] = completed
-
-                if result.status_code == 200:
-                    fingerprinter.analyze_headers(result.headers)
-                    tech = fingerprinter.analyze_url(result.url, result.status_code)
+        results = await scanner.scan_urls(urls, progress_callback)
 
         scan_data["technologies"] = fingerprinter.get_all_detected()
 
