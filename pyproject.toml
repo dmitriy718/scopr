@@ -1,7 +1,7 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "scopr"
+version = "1.0.0"
+description = "Scopr - The ultimate web recon tool for security researchers and bug bounty hunters"
 requires-python = ">=3.11"
 dependencies = [
     "aiohttp>=3.13.2",

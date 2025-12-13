@@ -1,6 +1,6 @@
 """
-Web Folder & Endpoint Discovery Tool - Main Flask Application
-A production-ready security tool for discovering accessible folders and endpoints.
+Scopr - Web Recon Tool
+The ultimate reconnaissance platform for security researchers and bug bounty hunters.
 """
 
 import os

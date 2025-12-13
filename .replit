@@ -16,10 +16,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Web Endpoint Discovery"
+args = "Scopr"
 
 [[workflows.workflow]]
-name = "Web Endpoint Discovery"
+name = "Scopr"
 author = "agent"
 
 [[workflows.workflow.tasks]]

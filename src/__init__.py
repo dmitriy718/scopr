@@ -1,7 +1,7 @@
 """
-Web Folder & Endpoint Discovery Tool
-A production-ready security tool for discovering accessible folders and endpoints on web servers.
+Scopr - Web Recon Tool
+The ultimate reconnaissance platform for security researchers and bug bounty hunters.
 """
 
 __version__ = "1.0.0"
-__author__ = "Security Scanner Tool"
+__author__ = "Scopr"
