@@ -2393,7 +2393,7 @@
             workflows.presets.forEach(workflow => {
                 const card = document.createElement('div');
                 card.className = 'workflow-preset-card' + (selectedWorkflow?.id === workflow.id ? ' selected' : '');
-                card.onclick = () => selectWorkflow(workflow);
+                card.onclick = function() { selectWorkflow(workflow, this); };
                 
                 let stagesHtml = workflow.stages.filter(s => s.enabled).map(s => 
                     `<span class="stage-chip"><i class="bi ${stageIcons[s.stage_type] || 'bi-circle'}"></i>${s.name}</span>`
@@ -2415,13 +2415,16 @@
             }
         }
 
-        function selectWorkflow(workflow) {
+        function selectWorkflow(workflow, element) {
             selectedWorkflow = workflow;
             document.querySelectorAll('.workflow-preset-card').forEach(card => {
                 card.classList.remove('selected');
             });
-            event.currentTarget?.classList.add('selected');
-            renderWorkflowPresets();
+            if (element) {
+                element.classList.add('selected');
+            } else {
+                renderWorkflowPresets();
+            }
         }
 
         function toggleScanMode(mode) {
