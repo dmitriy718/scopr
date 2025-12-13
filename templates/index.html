@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -1334,6 +1335,98 @@
             color: var(--text-primary);
             font-weight: 500;
         }
+        
+        .asset-map-container {
+            height: 450px;
+            background: rgba(10, 10, 15, 0.6);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .asset-map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(15, 15, 25, 0.4);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.domain { background: #6366f1; }
+        .legend-dot.subdomain { background: #06b6d4; }
+        .legend-dot.endpoint { background: #22c55e; }
+        .legend-dot.js-endpoint { background: #f59e0b; }
+        .legend-dot.secret { background: #ef4444; }
+        .legend-dot.technology { background: #a855f7; }
+        
+        .asset-map-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .map-control-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(25, 25, 40, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .map-control-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        .asset-stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(15, 15, 25, 0.4);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        
+        .asset-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .asset-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+        
+        .asset-stat-label {
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -1628,6 +1721,74 @@
                         <div class="takeover-stats" id="takeover-stats"></div>
                         <div class="results-container" id="takeover-container"></div>
                     </div>
+
+                    <div class="glass-card-static secondary-card mt-4" id="asset-map-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <i class="bi bi-diagram-3-fill"></i>
+                            </div>
+                            <h5>Visual Asset Map</h5>
+                            <span class="badge-count" id="asset-node-count">0</span>
+                        </div>
+                        <div class="asset-stats-bar" id="asset-stats-bar">
+                            <div class="asset-stat">
+                                <span class="asset-stat-value" id="asset-domains">0</span>
+                                <span class="asset-stat-label">Domains</span>
+                            </div>
+                            <div class="asset-stat">
+                                <span class="asset-stat-value" id="asset-subdomains">0</span>
+                                <span class="asset-stat-label">Subdomains</span>
+                            </div>
+                            <div class="asset-stat">
+                                <span class="asset-stat-value" id="asset-endpoints">0</span>
+                                <span class="asset-stat-label">Endpoints</span>
+                            </div>
+                            <div class="asset-stat">
+                                <span class="asset-stat-value" id="asset-js-endpoints">0</span>
+                                <span class="asset-stat-label">JS Endpoints</span>
+                            </div>
+                            <div class="asset-stat">
+                                <span class="asset-stat-value" id="asset-secrets">0</span>
+                                <span class="asset-stat-label">Secrets</span>
+                            </div>
+                        </div>
+                        <div class="asset-map-container" id="asset-map">
+                            <div class="asset-map-controls">
+                                <button class="map-control-btn" onclick="fitAssetMap()" title="Fit to view">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                                <button class="map-control-btn" onclick="togglePhysics()" title="Toggle physics">
+                                    <i class="bi bi-bezier2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="asset-map-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot domain"></span>
+                                <span>Domain</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot subdomain"></span>
+                                <span>Subdomain</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot endpoint"></span>
+                                <span>Endpoint</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot js-endpoint"></span>
+                                <span>JS Endpoint</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot secret"></span>
+                                <span>Secret</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot technology"></span>
+                                <span>Technology</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1705,6 +1866,7 @@
             document.getElementById('js-endpoints-card').style.display = 'none';
             document.getElementById('secrets-card').style.display = 'none';
             document.getElementById('takeover-card').style.display = 'none';
+            document.getElementById('asset-map-card').style.display = 'none';
 
             const statusEl = document.getElementById('scan-status');
             statusEl.className = 'progress-status scanning';
@@ -1767,6 +1929,8 @@
                 if (resultsData.takeover && resultsData.takeover.length > 0) {
                     displayTakeover(resultsData.takeover, resultsData.takeover_stats);
                 }
+
+                buildAssetMap(resultsData);
 
                 statusEl.className = 'progress-status complete';
                 statusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Scan Complete</span>';
@@ -2329,6 +2493,8 @@
                 if (resultsData.secrets?.length > 0) displaySecrets(resultsData.secrets, resultsData.secrets_stats);
                 if (resultsData.takeover?.length > 0) displayTakeover(resultsData.takeover, resultsData.takeover_stats);
 
+                buildAssetMap(resultsData);
+
                 statusEl.className = 'progress-status complete';
                 statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i><span>${selectedWorkflow.name} Complete</span>`;
 
@@ -2340,6 +2506,202 @@
                 scanBtn.disabled = false;
                 scanBtn.classList.remove('scanning');
                 scanBtn.innerHTML = '<i class="bi bi-play-fill"></i><span>Start Scan</span>';
+            }
+        }
+
+        let assetNetwork = null;
+        let physicsEnabled = true;
+        let lastScanData = null;
+
+        function buildAssetMap(data) {
+            lastScanData = data;
+            const domain = document.getElementById('domain').value.trim();
+            const nodes = [];
+            const edges = [];
+            let nodeId = 1;
+            const nodeMap = {};
+            
+            const domainNodeId = nodeId++;
+            nodes.push({
+                id: domainNodeId,
+                label: domain,
+                color: { background: '#6366f1', border: '#4f46e5', highlight: { background: '#818cf8', border: '#6366f1' }},
+                size: 35,
+                font: { color: '#f8fafc', size: 14, face: 'Inter' },
+                shape: 'dot',
+                borderWidth: 3,
+                shadow: true,
+                title: 'Primary Domain: ' + domain
+            });
+            nodeMap['domain:' + domain] = domainNodeId;
+            
+            let domainCount = 1;
+            let subdomainCount = 0;
+            let endpointCount = 0;
+            let jsEndpointCount = 0;
+            let secretCount = 0;
+            
+            if (data.subdomains && data.subdomains.length > 0) {
+                data.subdomains.slice(0, 30).forEach(sub => {
+                    const subId = nodeId++;
+                    nodes.push({
+                        id: subId,
+                        label: sub.subdomain,
+                        color: { background: '#06b6d4', border: '#0891b2', highlight: { background: '#22d3ee', border: '#06b6d4' }},
+                        size: 20,
+                        font: { color: '#f8fafc', size: 11, face: 'Inter' },
+                        shape: 'dot',
+                        title: 'Subdomain: ' + sub.full_domain + '\nIPs: ' + (sub.ip_addresses || []).join(', ')
+                    });
+                    edges.push({ from: domainNodeId, to: subId, color: { color: '#0891b2', opacity: 0.6 }, width: 1.5 });
+                    nodeMap['subdomain:' + sub.subdomain] = subId;
+                    subdomainCount++;
+                });
+            }
+            
+            if (data.results && data.results.length > 0) {
+                const successEndpoints = data.results.filter(r => r.status_code === 200 && !r.is_soft_404).slice(0, 40);
+                successEndpoints.forEach(r => {
+                    try {
+                        const url = new URL(r.url);
+                        const path = url.pathname;
+                        if (path === '/' || path === '') return;
+                        
+                        const endpointId = nodeId++;
+                        const shortLabel = path.length > 20 ? '...' + path.slice(-18) : path;
+                        nodes.push({
+                            id: endpointId,
+                            label: shortLabel,
+                            color: { background: '#22c55e', border: '#16a34a', highlight: { background: '#4ade80', border: '#22c55e' }},
+                            size: 12,
+                            font: { color: '#f8fafc', size: 10, face: 'JetBrains Mono' },
+                            shape: 'dot',
+                            title: 'Endpoint: ' + path + '\nStatus: ' + r.status_code + '\nSize: ' + (r.content_length || 0) + ' bytes'
+                        });
+                        edges.push({ from: domainNodeId, to: endpointId, color: { color: '#16a34a', opacity: 0.4 }, width: 1 });
+                        nodeMap['endpoint:' + path] = endpointId;
+                        endpointCount++;
+                    } catch (e) {}
+                });
+            }
+            
+            if (data.js_endpoints && data.js_endpoints.length > 0) {
+                data.js_endpoints.slice(0, 25).forEach(ep => {
+                    const jsId = nodeId++;
+                    const shortLabel = ep.url.length > 25 ? '...' + ep.url.slice(-23) : ep.url;
+                    nodes.push({
+                        id: jsId,
+                        label: shortLabel,
+                        color: { background: '#f59e0b', border: '#d97706', highlight: { background: '#fbbf24', border: '#f59e0b' }},
+                        size: 10,
+                        font: { color: '#f8fafc', size: 9, face: 'JetBrains Mono' },
+                        shape: 'diamond',
+                        title: 'JS Endpoint: ' + ep.url + '\nType: ' + ep.type + '\nSource: ' + ep.source
+                    });
+                    edges.push({ from: domainNodeId, to: jsId, color: { color: '#d97706', opacity: 0.4 }, width: 1, dashes: true });
+                    jsEndpointCount++;
+                });
+            }
+            
+            if (data.secrets && data.secrets.length > 0) {
+                data.secrets.slice(0, 15).forEach(s => {
+                    const secretId = nodeId++;
+                    nodes.push({
+                        id: secretId,
+                        label: s.type,
+                        color: { background: '#ef4444', border: '#dc2626', highlight: { background: '#f87171', border: '#ef4444' }},
+                        size: 14,
+                        font: { color: '#f8fafc', size: 10, face: 'Inter', bold: true },
+                        shape: 'triangle',
+                        title: 'SECRET: ' + s.type + '\nSeverity: ' + s.severity + '\nSource: ' + s.source
+                    });
+                    edges.push({ from: domainNodeId, to: secretId, color: { color: '#dc2626', opacity: 0.6 }, width: 2 });
+                    secretCount++;
+                });
+            }
+            
+            if (data.technologies && data.technologies.length > 0) {
+                data.technologies.slice(0, 10).forEach(tech => {
+                    const techId = nodeId++;
+                    const label = tech.version ? tech.name + ' v' + tech.version : tech.name;
+                    nodes.push({
+                        id: techId,
+                        label: label,
+                        color: { background: '#a855f7', border: '#9333ea', highlight: { background: '#c084fc', border: '#a855f7' }},
+                        size: 15,
+                        font: { color: '#f8fafc', size: 10, face: 'Inter' },
+                        shape: 'square',
+                        title: 'Technology: ' + tech.name + (tech.version ? ' v' + tech.version : '') + '\nCategory: ' + tech.category
+                    });
+                    edges.push({ from: domainNodeId, to: techId, color: { color: '#9333ea', opacity: 0.5 }, width: 1.5 });
+                });
+            }
+            
+            document.getElementById('asset-domains').textContent = domainCount;
+            document.getElementById('asset-subdomains').textContent = subdomainCount;
+            document.getElementById('asset-endpoints').textContent = endpointCount;
+            document.getElementById('asset-js-endpoints').textContent = jsEndpointCount;
+            document.getElementById('asset-secrets').textContent = secretCount;
+            document.getElementById('asset-node-count').textContent = nodes.length;
+            
+            if (nodes.length > 1) {
+                const container = document.getElementById('asset-map');
+                
+                const networkData = {
+                    nodes: new vis.DataSet(nodes),
+                    edges: new vis.DataSet(edges)
+                };
+                
+                const options = {
+                    physics: {
+                        enabled: physicsEnabled,
+                        stabilization: { iterations: 100 },
+                        barnesHut: {
+                            gravitationalConstant: -3000,
+                            centralGravity: 0.3,
+                            springLength: 120,
+                            springConstant: 0.04,
+                            damping: 0.09
+                        }
+                    },
+                    interaction: {
+                        hover: true,
+                        tooltipDelay: 100,
+                        navigationButtons: false,
+                        keyboard: true,
+                        zoomView: true,
+                        dragView: true
+                    },
+                    layout: {
+                        improvedLayout: true,
+                        randomSeed: 42
+                    }
+                };
+                
+                if (assetNetwork) {
+                    assetNetwork.destroy();
+                }
+                assetNetwork = new vis.Network(container, networkData, options);
+                
+                assetNetwork.on('stabilizationIterationsDone', function() {
+                    assetNetwork.setOptions({ physics: { enabled: false } });
+                    physicsEnabled = false;
+                });
+                
+                document.getElementById('asset-map-card').style.display = 'block';
+            }
+        }
+        
+        function fitAssetMap() {
+            if (assetNetwork) {
+                assetNetwork.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' }});
+            }
+        }
+        
+        function togglePhysics() {
+            if (assetNetwork) {
+                physicsEnabled = !physicsEnabled;
+                assetNetwork.setOptions({ physics: { enabled: physicsEnabled }});
             }
         }
 
