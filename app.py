@@ -24,6 +24,7 @@ from src.parameters import ParameterScanner, discover_parameters
 from src.security import SecurityAnalyzer
 from src.js_parser import JSEndpointExtractor
 from src.secrets_scanner import SecretsScanner
+from src.takeover import TakeoverDetector
 
 load_dotenv()
 
@@ -284,6 +285,12 @@ async def run_scan(scan_data: dict) -> List[dict]:
             enumerator = SubdomainEnumerator(domain_only, max_concurrent=10)
             await enumerator.enumerate()
             scan_data["subdomains"] = enumerator.get_results_as_dict()
+            
+            if options.get("check_takeover", True) and scan_data["subdomains"]:
+                takeover_detector = TakeoverDetector()
+                await takeover_detector.scan_subdomains(scan_data["subdomains"])
+                scan_data["takeover"] = takeover_detector.get_vulnerable_as_dict()
+                scan_data["takeover_stats"] = takeover_detector.get_stats()
         except Exception as e:
             logger.warning(f"Subdomain enumeration error: {e}")
 
@@ -354,6 +361,8 @@ def get_scan_results(scan_id: str):
         "js_endpoints": scan_data.get("js_endpoints", []),
         "secrets": scan_data.get("secrets", []),
         "secrets_stats": scan_data.get("secrets_stats", {}),
+        "takeover": scan_data.get("takeover", []),
+        "takeover_stats": scan_data.get("takeover_stats", {}),
         "total": len(results)
     })
 

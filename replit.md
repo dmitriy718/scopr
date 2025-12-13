@@ -1,7 +1,7 @@
 # Web Endpoint Discovery Tool
 
 ## Overview
-A production-ready web folder and endpoint discovery tool for security professionals. Built with Flask and async Python for high-performance scanning.
+A production-ready web reconnaissance platform for security professionals and bug bounty hunters. Built with Flask and async Python for high-performance scanning. Features JS endpoint extraction, secrets scanning, security header analysis, and more.
 
 ## Project Structure
 ```
@@ -15,7 +15,10 @@ A production-ready web folder and endpoint discovery tool for security professio
 │   ├── subdomain.py      # DNS-based subdomain enumeration
 │   ├── exporter.py       # JSON/CSV/TXT export functionality
 │   ├── parameters.py     # Parameter discovery module
-│   └── security.py       # Security header analysis module
+│   ├── security.py       # Security header analysis module
+│   ├── js_parser.py      # JavaScript endpoint extraction
+│   ├── secrets_scanner.py # Exposed secrets/API key detection
+│   └── takeover.py       # Subdomain takeover detection
 ├── templates/
 │   └── index.html        # Bootstrap 5 web interface with glassmorphism design
 ├── wordlists/            # Custom wordlist storage directory
@@ -41,16 +44,18 @@ Environment variables (set in Secrets or .env):
 - `SESSION_SECRET`: Flask session secret
 
 ## Recent Changes (December 2025)
+- Added Subdomain Takeover Detection (src/takeover.py) - 20+ vulnerable services
+- Added JavaScript Endpoint Extraction (src/js_parser.py)
+- Added Secrets Scanner with 25+ patterns (src/secrets_scanner.py)
 - Added Security Header Analysis with grade scoring (A+ to F)
 - Added Directory Listing Detection for exposed directories
 - Added Scan Statistics Dashboard (requests/sec, duration, avg time)
 - Added Result Sorting (by status, response time, size)
 - Added Scan History with localStorage persistence
-- Added Response Time display for each result
-- Fixed concurrent scanning for faster performance
+- Fixed scan config card centering (centered initially, side-by-side after scan)
 - Modern UI with glassmorphism, gradients, and animations
 
-## Features (15+ Implemented)
+## Features (19 Implemented)
 1. Asynchronous Scanning - High-performance concurrent requests
 2. Custom Wordlist Support - Upload or select built-in categories
 3. Recursive Discovery - Configurable depth subfolder scanning
@@ -67,6 +72,13 @@ Environment variables (set in Secrets or .env):
 14. Scan Statistics - Performance metrics dashboard
 15. Result Filtering & Sorting - By status, time, size
 16. Scan History - Browser localStorage persistence
+17. JavaScript Endpoint Extraction - Parse JS for hidden APIs
+18. Secrets Scanner - Detect exposed API keys, tokens, credentials
+19. Subdomain Takeover Detection - Dangling DNS to 20+ vulnerable services
+
+## Remaining Tasks
+- Scan Chaining/Workflows - Automated multi-stage recon
+- Visual Asset Map - Graph visualization of assets
 
 ## Architecture Decisions
 - Async scanning for performance within Replit limits
@@ -74,3 +86,6 @@ Environment variables (set in Secrets or .env):
 - Built-in wordlists to avoid external dependencies
 - Soft 404 detection using baseline comparison
 - Security scoring based on header presence/exposure
+- JS parsing extracts endpoints from fetch, axios, XMLHttpRequest, etc.
+- Secrets scanner detects AWS, GitHub, Stripe, OpenAI keys and more
+- Takeover detection checks CNAME records against known vulnerable services (AWS S3, Heroku, GitHub Pages, Azure, Netlify, Vercel, etc.)

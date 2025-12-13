@@ -1062,6 +1062,87 @@
             border-radius: 4px;
             border-left: 3px solid var(--warning);
         }
+        
+        .takeover-stats {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .takeover-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .takeover-stat.high { color: #f87171; }
+        .takeover-stat.medium { color: #fcd34d; }
+        .takeover-stat.low { color: #86efac; }
+        
+        .takeover-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .takeover-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .takeover-domain {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--danger-light);
+            word-break: break-all;
+        }
+        
+        .takeover-service {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(168, 85, 247, 0.2);
+            color: #c084fc;
+        }
+        
+        .takeover-severity {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .takeover-severity.high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .takeover-severity.medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .takeover-severity.low { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        
+        .takeover-cname {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
+        
+        .takeover-fingerprint {
+            font-size: 0.8rem;
+            color: var(--warning-light);
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -1326,6 +1407,18 @@
                         <div class="secrets-stats" id="secrets-stats"></div>
                         <div class="results-container" id="secrets-container"></div>
                     </div>
+
+                    <div class="glass-card-static secondary-card mt-4" id="takeover-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                                <i class="bi bi-exclamation-octagon-fill"></i>
+                            </div>
+                            <h5>Subdomain Takeover Vulnerabilities</h5>
+                            <span class="badge-count danger" id="takeover-count">0</span>
+                        </div>
+                        <div class="takeover-stats" id="takeover-stats"></div>
+                        <div class="results-container" id="takeover-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1402,6 +1495,7 @@
             document.getElementById('security-card').style.display = 'none';
             document.getElementById('js-endpoints-card').style.display = 'none';
             document.getElementById('secrets-card').style.display = 'none';
+            document.getElementById('takeover-card').style.display = 'none';
 
             const statusEl = document.getElementById('scan-status');
             statusEl.className = 'progress-status scanning';
@@ -1459,6 +1553,10 @@
 
                 if (resultsData.secrets && resultsData.secrets.length > 0) {
                     displaySecrets(resultsData.secrets, resultsData.secrets_stats);
+                }
+
+                if (resultsData.takeover && resultsData.takeover.length > 0) {
+                    displayTakeover(resultsData.takeover, resultsData.takeover_stats);
                 }
 
                 statusEl.className = 'progress-status complete';
@@ -1812,6 +1910,44 @@
 
             if (secrets.length > 0) {
                 document.getElementById('secrets-card').style.display = 'block';
+            }
+        }
+
+        function displayTakeover(takeovers, stats) {
+            const container = document.getElementById('takeover-container');
+            const statsContainer = document.getElementById('takeover-stats');
+            container.innerHTML = '';
+            statsContainer.innerHTML = '';
+            
+            document.getElementById('takeover-count').textContent = takeovers.length;
+
+            if (stats && stats.by_severity) {
+                const sev = stats.by_severity;
+                statsContainer.innerHTML = `
+                    ${sev.high > 0 ? `<div class="takeover-stat high"><i class="bi bi-exclamation-triangle-fill"></i> ${sev.high} High</div>` : ''}
+                    ${sev.medium > 0 ? `<div class="takeover-stat medium"><i class="bi bi-exclamation-circle-fill"></i> ${sev.medium} Medium</div>` : ''}
+                    ${sev.low > 0 ? `<div class="takeover-stat low"><i class="bi bi-info-circle-fill"></i> ${sev.low} Low</div>` : ''}
+                `;
+            }
+
+            takeovers.forEach((t, index) => {
+                const item = document.createElement('div');
+                item.className = 'takeover-item';
+                item.style.animationDelay = `${index * 0.02}s`;
+                item.innerHTML = `
+                    <div class="takeover-header">
+                        <span class="takeover-domain">${t.full_domain}</span>
+                        <span class="takeover-service">${t.service}</span>
+                        <span class="takeover-severity ${t.severity}">${t.severity}</span>
+                    </div>
+                    <div class="takeover-cname"><i class="bi bi-arrow-right"></i> CNAME: ${t.cname}</div>
+                    ${t.fingerprint_matched ? `<div class="takeover-fingerprint"><i class="bi bi-bug-fill"></i> ${t.fingerprint_matched}</div>` : ''}
+                `;
+                container.appendChild(item);
+            });
+
+            if (takeovers.length > 0) {
+                document.getElementById('takeover-card').style.display = 'block';
             }
         }
 
