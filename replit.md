@@ -55,7 +55,7 @@ Environment variables (set in Secrets or .env):
 - Fixed scan config card centering (centered initially, side-by-side after scan)
 - Modern UI with glassmorphism, gradients, and animations
 
-## Features (19 Implemented)
+## Features (20 Implemented)
 1. Asynchronous Scanning - High-performance concurrent requests
 2. Custom Wordlist Support - Upload or select built-in categories
 3. Recursive Discovery - Configurable depth subfolder scanning
@@ -75,9 +75,9 @@ Environment variables (set in Secrets or .env):
 17. JavaScript Endpoint Extraction - Parse JS for hidden APIs
 18. Secrets Scanner - Detect exposed API keys, tokens, credentials
 19. Subdomain Takeover Detection - Dangling DNS to 20+ vulnerable services
+20. Scan Chaining/Workflows - 5 preset workflows for automated multi-stage recon
 
 ## Remaining Tasks
-- Scan Chaining/Workflows - Automated multi-stage recon
 - Visual Asset Map - Graph visualization of assets
 
 ## Architecture Decisions
@@ -89,3 +89,4 @@ Environment variables (set in Secrets or .env):
 - JS parsing extracts endpoints from fetch, axios, XMLHttpRequest, etc.
 - Secrets scanner detects AWS, GitHub, Stripe, OpenAI keys and more
 - Takeover detection checks CNAME records against known vulnerable services (AWS S3, Heroku, GitHub Pages, Azure, Netlify, Vercel, etc.)
+- Workflow system with 5 presets (Quick Recon, Full Recon, API Recon, Subdomain Takeover Hunt, Secrets Hunt)

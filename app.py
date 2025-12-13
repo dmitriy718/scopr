@@ -25,6 +25,7 @@ from src.security import SecurityAnalyzer
 from src.js_parser import JSEndpointExtractor
 from src.secrets_scanner import SecretsScanner
 from src.takeover import TakeoverDetector
+from src.workflows import workflow_manager, StageType
 
 load_dotenv()
 
@@ -477,6 +478,122 @@ def upload_wordlist():
 def get_app_config():
     """Get current application configuration."""
     return jsonify(get_config())
+
+
+@app.route('/api/workflows')
+def list_workflows():
+    """List all available workflows (presets and custom)."""
+    return jsonify({
+        "presets": workflow_manager.get_presets(),
+        "custom": workflow_manager.get_custom_workflows(),
+        "stage_types": [
+            {"value": st.value, "info": workflow_manager.get_stage_options(st)}
+            for st in StageType
+        ]
+    })
+
+
+@app.route('/api/workflows/<workflow_id>')
+def get_workflow(workflow_id: str):
+    """Get a specific workflow by ID."""
+    workflow = workflow_manager.get_workflow(workflow_id)
+    if not workflow:
+        return jsonify({"error": "Workflow not found"}), 404
+    return jsonify(workflow.to_dict())
+
+
+@app.route('/api/workflows', methods=['POST'])
+def create_workflow():
+    """Create a new custom workflow."""
+    try:
+        data = request.get_json()
+        name = data.get('name', '').strip()
+        description = data.get('description', '').strip()
+        stages = data.get('stages', [])
+        
+        if not name:
+            return jsonify({"error": "Workflow name is required"}), 400
+        if not stages:
+            return jsonify({"error": "At least one stage is required"}), 400
+        
+        workflow = workflow_manager.create_workflow(name, description, stages)
+        return jsonify(workflow.to_dict())
+    except Exception as e:
+        logger.error(f"Error creating workflow: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/workflows/<workflow_id>', methods=['DELETE'])
+def delete_workflow(workflow_id: str):
+    """Delete a custom workflow."""
+    if workflow_manager.delete_workflow(workflow_id):
+        return jsonify({"success": True})
+    return jsonify({"error": "Cannot delete preset or non-existent workflow"}), 400
+
+
+@app.route('/api/workflows/<workflow_id>/execute', methods=['POST'])
+def execute_workflow(workflow_id: str):
+    """Execute a workflow on a domain."""
+    try:
+        data = request.get_json()
+        domain = data.get('domain', '').strip()
+        
+        if not domain:
+            return jsonify({"error": "Domain is required"}), 400
+        
+        workflow = workflow_manager.get_workflow(workflow_id)
+        if not workflow:
+            return jsonify({"error": "Workflow not found"}), 404
+        
+        execution = workflow_manager.create_execution(workflow_id, domain)
+        if not execution:
+            return jsonify({"error": "Failed to create execution"}), 500
+        
+        enabled_stages = [s for s in workflow.stages if s.enabled]
+        options = {
+            "scan_subdomains": any(s.stage_type == StageType.SUBDOMAIN_ENUM for s in enabled_stages),
+            "check_takeover": any(s.stage_type == StageType.TAKEOVER_CHECK for s in enabled_stages),
+            "parse_robots": True,
+            "parse_sitemap": True,
+            "scan_parameters": any(s.stage_type == StageType.PARAMETER_DISCOVERY for s in enabled_stages),
+        }
+        
+        for stage in enabled_stages:
+            if stage.stage_type == StageType.ENDPOINT_SCAN and stage.config:
+                options["wordlist"] = stage.config.get("wordlist", "all")
+                options["recursive"] = stage.config.get("recursive", False)
+                options["recursive_depth"] = stage.config.get("recursive_depth", 2)
+        
+        scan_id = str(uuid.uuid4())
+        active_scans[scan_id] = {
+            "id": scan_id,
+            "domain": domain,
+            "status": "pending",
+            "progress": 0,
+            "total": 0,
+            "results": [],
+            "technologies": [],
+            "subdomains": [],
+            "parameters": [],
+            "started_at": datetime.now().isoformat(),
+            "completed_at": None,
+            "error": None,
+            "options": options,
+            "workflow_id": workflow_id,
+            "workflow_name": workflow.name,
+            "execution_id": execution.id
+        }
+        
+        return jsonify({
+            "scan_id": scan_id,
+            "execution_id": execution.id,
+            "workflow": workflow.to_dict(),
+            "status": "pending",
+            "message": f"Workflow '{workflow.name}' initiated"
+        })
+    except Exception as e:
+        logger.error(f"Error executing workflow: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.after_request
