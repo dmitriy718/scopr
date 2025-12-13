@@ -1,4 +1,4 @@
-# Web Endpoint Discovery Tool
+# Scopr - Web Recon Tool
 
 ## Overview
 A production-ready web reconnaissance platform for security professionals and bug bounty hunters. Built with Flask and async Python for high-performance scanning. Features JS endpoint extraction, secrets scanning, security header analysis, and more.
