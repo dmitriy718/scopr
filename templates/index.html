@@ -911,6 +911,157 @@
                 -webkit-overflow-scrolling: touch;
             }
         }
+        
+        #config-col.centered {
+            margin: 0 auto;
+            float: none;
+        }
+        
+        #results-col {
+            display: none;
+        }
+        
+        #results-col.active {
+            display: block;
+        }
+        
+        .row.results-active #config-col {
+            margin: 0;
+        }
+        
+        .badge-count {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        .badge-count.danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-light);
+        }
+        
+        .secrets-stats {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .secret-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .secret-stat.critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+        
+        .secret-stat.high {
+            background: rgba(249, 115, 22, 0.15);
+            color: #fdba74;
+        }
+        
+        .secret-stat.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+        }
+        
+        .secret-stat.low {
+            background: rgba(34, 197, 94, 0.15);
+            color: #86efac;
+        }
+        
+        .js-endpoint-item, .secret-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            transition: background 0.2s;
+        }
+        
+        .js-endpoint-item:hover, .secret-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .endpoint-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--info);
+            word-break: break-all;
+        }
+        
+        .endpoint-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .endpoint-type {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .secret-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .secret-type {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .secret-severity {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .secret-severity.critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .secret-severity.high { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+        .secret-severity.medium { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .secret-severity.low { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        
+        .secret-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 4px;
+            color: var(--danger-light);
+            word-break: break-all;
+        }
+        
+        .secret-source {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .secret-recommendation {
+            font-size: 0.8rem;
+            color: var(--warning-light);
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--warning);
+        }
     </style>
 </head>
 <body>
@@ -926,9 +1077,9 @@
                 <p class="subtitle">Discover hidden folders, endpoints, and technologies on any web server with advanced scanning capabilities</p>
             </div>
 
-            <div class="row g-4 justify-content-center">
-                <div class="col-lg-5 col-xl-4">
-                    <div class="glass-card" style="animation: fadeInUp 0.5s ease-out">
+            <div class="row g-4" id="main-row">
+                <div class="col-lg-4 centered" id="config-col">
+                    <div class="glass-card" id="config-card" style="animation: fadeInUp 0.5s ease-out">
                         <div class="card-header-custom">
                             <div class="card-header-icon">
                                 <i class="bi bi-sliders"></i>
@@ -1034,7 +1185,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-8">
+                <div class="col-lg-8" id="results-col">
                     <div class="glass-card-static mb-4 progress-card" id="progress-card" style="display: none;">
                         <div class="card-body-custom">
                             <div class="progress-header">
@@ -1152,6 +1303,29 @@
                         </div>
                         <div class="results-container" id="security-container"></div>
                     </div>
+
+                    <div class="glass-card-static secondary-card mt-4" id="js-endpoints-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <i class="bi bi-filetype-js"></i>
+                            </div>
+                            <h5>JavaScript Endpoints</h5>
+                            <span class="badge-count" id="js-count">0</span>
+                        </div>
+                        <div class="results-container" id="js-endpoints-container"></div>
+                    </div>
+
+                    <div class="glass-card-static secondary-card mt-4" id="secrets-card" style="display: none;">
+                        <div class="card-header-custom">
+                            <div class="card-header-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                                <i class="bi bi-key-fill"></i>
+                            </div>
+                            <h5>Exposed Secrets</h5>
+                            <span class="badge-count danger" id="secrets-count">0</span>
+                        </div>
+                        <div class="secrets-stats" id="secrets-stats"></div>
+                        <div class="results-container" id="secrets-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1216,12 +1390,18 @@
             scanBtn.classList.add('scanning');
             scanBtn.innerHTML = '<i class="bi bi-hourglass-split"></i><span>Scanning...</span>';
             
+            document.getElementById('config-col').classList.remove('centered');
+            document.getElementById('results-col').classList.add('active');
+            document.getElementById('main-row').classList.add('results-active');
+            
             document.getElementById('progress-card').style.display = 'block';
             document.getElementById('stats-row').style.display = 'none';
             document.getElementById('results-card').style.display = 'none';
             document.getElementById('subdomains-card').style.display = 'none';
             document.getElementById('parameters-card').style.display = 'none';
             document.getElementById('security-card').style.display = 'none';
+            document.getElementById('js-endpoints-card').style.display = 'none';
+            document.getElementById('secrets-card').style.display = 'none';
 
             const statusEl = document.getElementById('scan-status');
             statusEl.className = 'progress-status scanning';
@@ -1271,6 +1451,14 @@
 
                 if (resultsData.security) {
                     displaySecurityAnalysis(resultsData.security);
+                }
+
+                if (resultsData.js_endpoints && resultsData.js_endpoints.length > 0) {
+                    displayJSEndpoints(resultsData.js_endpoints);
+                }
+
+                if (resultsData.secrets && resultsData.secrets.length > 0) {
+                    displaySecrets(resultsData.secrets, resultsData.secrets_stats);
                 }
 
                 statusEl.className = 'progress-status complete';
@@ -1561,6 +1749,70 @@
             }
 
             document.getElementById('security-card').style.display = 'block';
+        }
+
+        function displayJSEndpoints(endpoints) {
+            const container = document.getElementById('js-endpoints-container');
+            container.innerHTML = '';
+            
+            document.getElementById('js-count').textContent = endpoints.length;
+
+            endpoints.forEach((ep, index) => {
+                const item = document.createElement('div');
+                item.className = 'js-endpoint-item';
+                item.style.animationDelay = `${index * 0.02}s`;
+                item.innerHTML = `
+                    <div class="endpoint-url">${ep.url}</div>
+                    <div class="endpoint-meta">
+                        <span class="endpoint-type">${ep.type}</span>
+                        <span>Source: ${ep.source}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (endpoints.length > 0) {
+                document.getElementById('js-endpoints-card').style.display = 'block';
+            }
+        }
+
+        function displaySecrets(secrets, stats) {
+            const container = document.getElementById('secrets-container');
+            const statsContainer = document.getElementById('secrets-stats');
+            container.innerHTML = '';
+            statsContainer.innerHTML = '';
+            
+            document.getElementById('secrets-count').textContent = secrets.length;
+
+            if (stats && stats.by_severity) {
+                const sev = stats.by_severity;
+                statsContainer.innerHTML = `
+                    ${sev.critical > 0 ? `<div class="secret-stat critical"><i class="bi bi-exclamation-octagon-fill"></i> ${sev.critical} Critical</div>` : ''}
+                    ${sev.high > 0 ? `<div class="secret-stat high"><i class="bi bi-exclamation-triangle-fill"></i> ${sev.high} High</div>` : ''}
+                    ${sev.medium > 0 ? `<div class="secret-stat medium"><i class="bi bi-exclamation-circle-fill"></i> ${sev.medium} Medium</div>` : ''}
+                    ${sev.low > 0 ? `<div class="secret-stat low"><i class="bi bi-info-circle-fill"></i> ${sev.low} Low</div>` : ''}
+                `;
+            }
+
+            secrets.forEach((s, index) => {
+                const item = document.createElement('div');
+                item.className = 'secret-item';
+                item.style.animationDelay = `${index * 0.02}s`;
+                item.innerHTML = `
+                    <div class="secret-header">
+                        <span class="secret-type">${s.type}</span>
+                        <span class="secret-severity ${s.severity}">${s.severity}</span>
+                    </div>
+                    <div class="secret-value">${s.value}</div>
+                    <div class="secret-source"><i class="bi bi-link-45deg"></i> ${s.source}</div>
+                    <div class="secret-recommendation"><i class="bi bi-lightbulb"></i> ${s.recommendation}</div>
+                `;
+                container.appendChild(item);
+            });
+
+            if (secrets.length > 0) {
+                document.getElementById('secrets-card').style.display = 'block';
+            }
         }
 
         document.querySelectorAll('#results-tabs .filter-tab').forEach(tab => {

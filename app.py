@@ -22,6 +22,8 @@ from src.subdomain import SubdomainEnumerator
 from src.exporter import ResultExporter, export_results
 from src.parameters import ParameterScanner, discover_parameters
 from src.security import SecurityAnalyzer
+from src.js_parser import JSEndpointExtractor
+from src.secrets_scanner import SecretsScanner
 
 load_dotenv()
 
@@ -181,6 +183,8 @@ async def run_scan(scan_data: dict) -> List[dict]:
     wordlist_manager = WordlistManager()
     fingerprinter = TechnologyFingerprinter()
     security_analyzer = SecurityAnalyzer()
+    js_extractor = JSEndpointExtractor(base_url)
+    secrets_scanner = SecretsScanner()
 
     wordlist_type = options.get("wordlist", "all")
     paths = wordlist_manager.get_builtin_wordlist(wordlist_type)
@@ -230,9 +234,46 @@ async def run_scan(scan_data: dict) -> List[dict]:
                 security_analyzer.analyze_headers(result.headers, result.url)
             if result.is_directory_listing and result.url not in security_analyzer.directory_listings:
                 security_analyzer.directory_listings.append(result.url)
+            if result.content:
+                secrets_scanner.scan_content(result.content, result.url)
 
         scan_data["technologies"] = fingerprinter.get_all_detected()
         scan_data["security"] = security_analyzer.get_analysis().to_dict()
+        scan_data["secrets"] = secrets_scanner.get_findings()
+        scan_data["secrets_stats"] = secrets_scanner.get_stats()
+
+        js_urls = [r.url for r in results if r.url.endswith('.js') and r.status_code == 200]
+        html_results = [r for r in results if r.status_code == 200 and r.content and not r.url.endswith('.js')]
+        
+        for html_result in html_results:
+            if html_result.content:
+                import re
+                js_refs = re.findall(r'<script[^>]+src=["\']([^"\']+\.js)["\']', html_result.content, re.IGNORECASE)
+                for js_ref in js_refs:
+                    from urllib.parse import urljoin
+                    full_js_url = urljoin(html_result.url, js_ref)
+                    if full_js_url not in js_urls:
+                        js_urls.append(full_js_url)
+
+        if js_urls:
+            try:
+                import aiohttp
+                async with aiohttp.ClientSession() as session:
+                    for js_url in js_urls[:20]:
+                        try:
+                            async with session.get(js_url, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                                if resp.status == 200:
+                                    js_content = await resp.text()
+                                    js_extractor.extract_from_js(js_content, js_url)
+                                    secrets_scanner.scan_content(js_content, js_url)
+                        except:
+                            pass
+            except Exception as e:
+                logger.warning(f"JS parsing error: {e}")
+
+        scan_data["js_endpoints"] = js_extractor.get_all_endpoints()
+        scan_data["secrets"] = secrets_scanner.get_findings()
+        scan_data["secrets_stats"] = secrets_scanner.get_stats()
 
     if options.get("scan_subdomains", False):
         try:
@@ -310,6 +351,9 @@ def get_scan_results(scan_id: str):
         "subdomains": scan_data.get("subdomains", []),
         "parameters": scan_data.get("parameters", []),
         "security": scan_data.get("security", {}),
+        "js_endpoints": scan_data.get("js_endpoints", []),
+        "secrets": scan_data.get("secrets", []),
+        "secrets_stats": scan_data.get("secrets_stats", {}),
         "total": len(results)
     })
 
