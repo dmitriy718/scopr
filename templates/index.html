@@ -1690,6 +1690,78 @@
                 font-size: 0.85rem;
             }
         }
+        
+        .disclaimer-footer {
+            background: rgba(10, 10, 15, 0.95);
+            border-top: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 2rem 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .disclaimer-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .disclaimer-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--danger-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .disclaimer-header i {
+            font-size: 1.25rem;
+        }
+        
+        .disclaimer-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        .disclaimer-text strong {
+            color: var(--text-primary);
+        }
+        
+        .disclaimer-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .disclaimer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+            color: var(--success-light);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .disclaimer-badge.warning {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger-light);
+        }
+        
+        .disclaimer-copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -2210,6 +2282,31 @@
             </div>
         </div>
     </div>
+    
+    <footer class="disclaimer-footer">
+        <div class="disclaimer-container">
+            <div class="disclaimer-header">
+                <i class="bi bi-shield-exclamation"></i>
+                Legal Disclaimer & Responsible Use
+            </div>
+            <p class="disclaimer-text">
+                <strong>Scopr is designed exclusively for authorized security testing.</strong> This includes bug bounty programs, penetration testing engagements with signed statements of work, and security research where you have explicit written permission to test. Unauthorized scanning of systems you do not own or have permission to test is <strong>illegal</strong> in most jurisdictions.
+            </p>
+            <p class="disclaimer-text">
+                This tool was built by security professionals for security professionals. We assume no liability for misuse. By using Scopr, you confirm that you have proper authorization to scan your target(s).
+            </p>
+            <div class="disclaimer-badges">
+                <span class="disclaimer-badge"><i class="bi bi-check-circle"></i> Bug Bounty Programs</span>
+                <span class="disclaimer-badge"><i class="bi bi-check-circle"></i> Authorized Pentests</span>
+                <span class="disclaimer-badge"><i class="bi bi-check-circle"></i> Security Research</span>
+                <span class="disclaimer-badge"><i class="bi bi-check-circle"></i> Red Team Ops</span>
+                <span class="disclaimer-badge warning"><i class="bi bi-x-circle"></i> No Unauthorized Access</span>
+            </div>
+            <div class="disclaimer-copyright">
+                Scopr &copy; 2025 - Scan - Collect - Observe - Penetrate - Report
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
