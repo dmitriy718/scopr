@@ -158,14 +158,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
-            border-radius: 16px;
+            width: 120px;
+            height: 120px;
             margin-bottom: 1rem;
-            font-size: 1.75rem;
-            color: white;
-            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 30px rgba(99, 102, 241, 0.4));
         }
         
         .main-title {
@@ -1702,8 +1704,8 @@
             <button class="modal-close" onclick="closeWelcomeModal()">
                 <i class="bi bi-x-lg"></i>
             </button>
-            <div class="modal-icon">
-                <i class="bi bi-rocket-takeoff"></i>
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <img src="/static/images/scopr-logo.png" alt="Scopr Logo" style="width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 10px 30px rgba(99, 102, 241, 0.4));">
             </div>
             <h2 class="modal-title">Welcome to Scopr</h2>
             <p class="modal-subtitle">
@@ -1823,8 +1825,8 @@
             <button class="modal-close" onclick="closeExitModal()">
                 <i class="bi bi-x-lg"></i>
             </button>
-            <div class="modal-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
-                <i class="bi bi-hourglass-split"></i>
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <img src="/static/images/scopr-logo.png" alt="Scopr Logo" style="width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 10px 30px rgba(99, 102, 241, 0.4));">
             </div>
             <h2 class="modal-title">Before You Go...</h2>
             <p class="modal-subtitle">
@@ -1852,10 +1854,9 @@
         <div class="container-fluid px-4">
             <div class="header-section">
                 <div class="logo-icon">
-                    <i class="bi bi-radar"></i>
+                    <img src="/static/images/scopr-logo.png" alt="Scopr Logo">
                 </div>
-                <h1 class="main-title">Scopr</h1>
-                <p class="subtitle">The ultimate recon toolkit for security researchers. Discover what others miss.</p>
+                <p class="subtitle">Scan - Collect - Observe - Penetrate - Report</p>
             </div>
 
             <div class="row g-4" id="main-row">
