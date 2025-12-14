@@ -1427,10 +1427,426 @@
         .asset-stat-label {
             color: var(--text-muted);
         }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: rgba(17, 17, 27, 0.95);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 60px rgba(99, 102, 241, 0.15);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: none;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-light);
+        }
+        
+        .modal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .modal-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .beta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            color: var(--warning-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .beta-badge i {
+            font-size: 1.1rem;
+        }
+        
+        .modal-cta {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .modal-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.6);
+        }
+        
+        .modal-secondary {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: transparent;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+        }
+        
+        .modal-secondary:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: var(--text-primary);
+        }
+        
+        .contact-btn {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            color: var(--info);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+        
+        .contact-btn:hover {
+            background: rgba(6, 182, 212, 0.25);
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .contact-form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .contact-form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+        }
+        
+        .contact-form-group input,
+        .contact-form-group textarea,
+        .contact-form-group select {
+            width: 100%;
+            padding: 0.65rem 0.9rem;
+            background: rgba(15, 15, 25, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .contact-form-group input:focus,
+        .contact-form-group textarea:focus,
+        .contact-form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        
+        .contact-form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .contact-form-group select option {
+            background: #1a1a2e;
+        }
+        
+        .licensing-section {
+            background: rgba(15, 15, 25, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        
+        .licensing-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .contact-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        @media (max-width: 575px) {
+            .contact-form-row {
+                grid-template-columns: 1fr;
+            }
+            .contact-btn {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="bg-gradient-mesh"></div>
+    
+    <button class="contact-btn" onclick="openContactModal()">
+        <i class="bi bi-envelope"></i> Contact
+    </button>
+    
+    <div class="modal-overlay" id="welcome-modal">
+        <div class="modal-content" style="position: relative;">
+            <button class="modal-close" onclick="closeWelcomeModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-icon">
+                <i class="bi bi-rocket-takeoff"></i>
+            </div>
+            <h2 class="modal-title">Welcome to Scopr</h2>
+            <p class="modal-subtitle">
+                You're accessing our professional-grade web reconnaissance platform. Built for security researchers and bug bounty hunters.
+            </p>
+            <div style="text-align: center;">
+                <div class="beta-badge">
+                    <i class="bi bi-clock-history"></i>
+                    Public Beta Access: 72-96 Hours
+                </div>
+            </div>
+            <p class="modal-subtitle" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+                This is a limited preview. Interested in licensing Scopr for your organization or security team?
+            </p>
+            <button class="modal-cta" onclick="closeWelcomeModal()">
+                <i class="bi bi-lightning-charge"></i> Start Scanning
+            </button>
+            <button class="modal-secondary" onclick="closeWelcomeModal(); openContactModal();">
+                <i class="bi bi-building"></i> Inquire About Licensing
+            </button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="contact-modal">
+        <div class="modal-content" style="position: relative; max-width: 550px;">
+            <button class="modal-close" onclick="closeContactModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);">
+                <i class="bi bi-chat-dots"></i>
+            </div>
+            <h2 class="modal-title">Get In Touch</h2>
+            <p class="modal-subtitle" style="margin-bottom: 1rem;">
+                Questions about Scopr? Interested in licensing? We'd love to hear from you.
+            </p>
+            
+            <form id="contact-form" onsubmit="submitContactForm(event)">
+                <div class="contact-form-group">
+                    <label for="contact-subject">Subject</label>
+                    <input type="text" id="contact-subject" placeholder="What's this about?" required>
+                </div>
+                
+                <div class="contact-form-group">
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" placeholder="Your message..." required></textarea>
+                </div>
+                
+                <div class="licensing-section">
+                    <div class="licensing-title">
+                        <i class="bi bi-building"></i> Licensing Information (Optional)
+                    </div>
+                    
+                    <div class="contact-form-group">
+                        <label for="contact-company">Company / Organization</label>
+                        <input type="text" id="contact-company" placeholder="Your organization name">
+                    </div>
+                    
+                    <div class="contact-form-group">
+                        <label for="contact-usecase">Intended Use Case</label>
+                        <select id="contact-usecase">
+                            <option value="">Select use case...</option>
+                            <option value="bug-bounty">Bug Bounty Program</option>
+                            <option value="pentest">Penetration Testing</option>
+                            <option value="security-team">Internal Security Team</option>
+                            <option value="consulting">Security Consulting</option>
+                            <option value="research">Security Research</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="contact-form-row">
+                        <div class="contact-form-group">
+                            <label for="contact-seats">Number of Users/Seats</label>
+                            <select id="contact-seats">
+                                <option value="">Select...</option>
+                                <option value="1-5">1-5 users</option>
+                                <option value="6-20">6-20 users</option>
+                                <option value="21-50">21-50 users</option>
+                                <option value="50+">50+ users</option>
+                            </select>
+                        </div>
+                        
+                        <div class="contact-form-group">
+                            <label for="contact-model">Preferred Model</label>
+                            <select id="contact-model">
+                                <option value="">Select...</option>
+                                <option value="subscription">Monthly/Annual Subscription</option>
+                                <option value="perpetual">Perpetual License</option>
+                                <option value="enterprise">Enterprise Agreement</option>
+                                <option value="unsure">Not Sure Yet</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-form-group" style="margin-bottom: 0;">
+                        <label for="contact-budget">Budget Range</label>
+                        <select id="contact-budget">
+                            <option value="">Select budget range...</option>
+                            <option value="<1k">Under $1,000/year</option>
+                            <option value="1k-5k">$1,000 - $5,000/year</option>
+                            <option value="5k-20k">$5,000 - $20,000/year</option>
+                            <option value="20k+">$20,000+/year</option>
+                            <option value="discuss">Let's Discuss</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="modal-cta">
+                    <i class="bi bi-send"></i> Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="exit-modal">
+        <div class="modal-content" style="position: relative;">
+            <button class="modal-close" onclick="closeExitModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h2 class="modal-title">Before You Go...</h2>
+            <p class="modal-subtitle">
+                Remember, this public beta access is only available for <strong>72-96 hours</strong>. Make the most of Scopr's powerful reconnaissance features while you can!
+            </p>
+            <div style="text-align: center;">
+                <div class="beta-badge">
+                    <i class="bi bi-stars"></i>
+                    Limited Time Access
+                </div>
+            </div>
+            <p class="modal-subtitle" style="font-size: 0.85rem;">
+                Want to secure long-term access? Contact us about enterprise licensing options.
+            </p>
+            <button class="modal-cta" onclick="closeExitModal()">
+                <i class="bi bi-arrow-left"></i> Stay & Keep Scanning
+            </button>
+            <button class="modal-secondary" onclick="closeExitModal(); openContactModal();">
+                <i class="bi bi-building"></i> Inquire About Licensing
+            </button>
+        </div>
+    </div>
     
     <div class="main-container">
         <div class="container-fluid px-4">
@@ -2707,6 +3123,108 @@
                 assetNetwork.setOptions({ physics: { enabled: physicsEnabled }});
             }
         }
+
+        function openWelcomeModal() {
+            document.getElementById('welcome-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWelcomeModal() {
+            document.getElementById('welcome-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            sessionStorage.setItem('scopr-welcome-seen', 'true');
+        }
+
+        function openContactModal() {
+            document.getElementById('contact-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            document.getElementById('contact-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function openExitModal() {
+            document.getElementById('exit-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExitModal() {
+            document.getElementById('exit-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            sessionStorage.setItem('scopr-exit-shown', 'true');
+        }
+
+        function submitContactForm(e) {
+            e.preventDefault();
+            
+            const formData = {
+                subject: document.getElementById('contact-subject').value,
+                message: document.getElementById('contact-message').value,
+                company: document.getElementById('contact-company').value,
+                usecase: document.getElementById('contact-usecase').value,
+                seats: document.getElementById('contact-seats').value,
+                model: document.getElementById('contact-model').value,
+                budget: document.getElementById('contact-budget').value
+            };
+            
+            let mailBody = formData.message;
+            if (formData.company || formData.usecase || formData.seats || formData.model || formData.budget) {
+                mailBody += '\n\n--- Licensing Information ---';
+                if (formData.company) mailBody += '\nCompany: ' + formData.company;
+                if (formData.usecase) mailBody += '\nUse Case: ' + formData.usecase;
+                if (formData.seats) mailBody += '\nUsers/Seats: ' + formData.seats;
+                if (formData.model) mailBody += '\nPreferred Model: ' + formData.model;
+                if (formData.budget) mailBody += '\nBudget Range: ' + formData.budget;
+            }
+            
+            const mailtoLink = 'mailto:licensing@scopr.io?subject=' + 
+                encodeURIComponent('[Scopr] ' + formData.subject) + 
+                '&body=' + encodeURIComponent(mailBody);
+            
+            window.open(mailtoLink, '_blank');
+            
+            document.getElementById('contact-form').reset();
+            closeContactModal();
+            
+            alert('Your email client should open now. If it doesn\'t, please contact us directly at licensing@scopr.io');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+        });
+
+        window.addEventListener('load', function() {
+            if (!sessionStorage.getItem('scopr-welcome-seen')) {
+                setTimeout(openWelcomeModal, 500);
+            }
+        });
+
+        let exitIntentShown = false;
+        document.addEventListener('mouseout', function(e) {
+            if (e.clientY < 10 && !exitIntentShown && !sessionStorage.getItem('scopr-exit-shown')) {
+                const anyModalOpen = document.querySelector('.modal-overlay.active');
+                if (!anyModalOpen) {
+                    exitIntentShown = true;
+                    openExitModal();
+                }
+            }
+        });
 
         loadWorkflows();
     </script>

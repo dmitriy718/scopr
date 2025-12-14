@@ -46,6 +46,9 @@ Environment variables (set in Secrets or .env):
 - `SESSION_SECRET`: Flask session secret
 
 ## Recent Changes (December 2025)
+- Added Entry/Exit Modals with "72-96 hour public beta" messaging
+- Added Contact button (top-right, glassmorphism with cyan glow)
+- Added Contact Modal with licensing inquiry form (company, use case, seats, budget)
 - Added Subdomain Takeover Detection (src/takeover.py) - 20+ vulnerable services
 - Added JavaScript Endpoint Extraction (src/js_parser.py)
 - Added Secrets Scanner with 25+ patterns (src/secrets_scanner.py)
