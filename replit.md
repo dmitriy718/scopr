@@ -18,7 +18,8 @@ A production-ready web reconnaissance platform for security professionals and bu
 │   ├── security.py       # Security header analysis module
 │   ├── js_parser.py      # JavaScript endpoint extraction
 │   ├── secrets_scanner.py # Exposed secrets/API key detection
-│   └── takeover.py       # Subdomain takeover detection
+│   ├── takeover.py       # Subdomain takeover detection
+│   └── workflows.py      # Scan workflow management (5 presets)
 ├── templates/
 │   └── index.html        # Bootstrap 5 web interface with glassmorphism design
 ├── wordlists/            # Custom wordlist storage directory
@@ -27,9 +28,10 @@ A production-ready web reconnaissance platform for security professionals and bu
 
 ## Key Technologies
 - **Backend**: Python 3.11, Flask, aiohttp, asyncio
-- **Frontend**: Bootstrap 5, vanilla JavaScript
+- **Frontend**: Bootstrap 5, vanilla JavaScript, vis.js
 - **DNS**: dnspython for subdomain enumeration
 - **Parsing**: BeautifulSoup, lxml for HTML/XML parsing
+- **Visualization**: vis.js for interactive asset maps
 
 ## Running the Application
 - The app runs on port 5000 with Flask
