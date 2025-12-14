@@ -41,6 +41,7 @@ class ScanResult:
     is_directory_listing: bool = False
     response_time: float = 0.0
     error: Optional[str] = None
+    content: Optional[str] = None
 
     def to_dict(self) -> Dict:
         """Convert result to dictionary for JSON export."""
@@ -261,7 +262,8 @@ class AsyncScanner:
                         headers=headers_dict,
                         is_soft_404=self.is_soft_404(content, response.status),
                         is_directory_listing=self.is_directory_listing(content, response.status),
-                        response_time=response_time
+                        response_time=response_time,
+                        content=content[:5000] if len(content) > 5000 else content
                     )
                     
                     return result
@@ -291,14 +293,16 @@ class AsyncScanner:
     async def scan_urls(
         self, 
         urls: List[str], 
-        progress_callback: Optional[Callable[[int, int, ScanResult], None]] = None
+        progress_callback: Optional[Callable[[int, int, ScanResult], None]] = None,
+        total_timeout: int = 120
     ) -> List[ScanResult]:
         """
-        Scan multiple URLs concurrently.
+        Scan multiple URLs concurrently with overall timeout.
         
         Args:
             urls: List of URLs to scan
             progress_callback: Optional callback function(completed, total, result)
+            total_timeout: Maximum time in seconds for entire scan (default 120)
             
         Returns:
             List of ScanResult objects
@@ -306,18 +310,25 @@ class AsyncScanner:
         self.results = []
         total = len(urls)
         completed = 0
+        start_time = time.time()
 
         tasks = []
         for url in urls:
             tasks.append(self.scan_url(url))
 
-        for coro in asyncio.as_completed(tasks):
-            result = await coro
-            if result:
-                self.results.append(result)
-                completed += 1
-                if progress_callback:
-                    progress_callback(completed, total, result)
+        try:
+            for coro in asyncio.as_completed(tasks, timeout=total_timeout):
+                try:
+                    result = await coro
+                    if result:
+                        self.results.append(result)
+                        completed += 1
+                        if progress_callback:
+                            progress_callback(completed, total, result)
+                except asyncio.TimeoutError:
+                    break
+        except asyncio.TimeoutError:
+            pass
 
         return self.results
 
