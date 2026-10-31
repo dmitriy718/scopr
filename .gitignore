@@ -49,3 +49,19 @@ exports/
 .cache/
 .upm/
 .config/
+
+# Secret & local state hygiene
+.env.local
+.env.production
+.dev.vars
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+.claude/
+.local/
+*.save
+*.bak
+vpspass.txt
+temp_pass.txt
